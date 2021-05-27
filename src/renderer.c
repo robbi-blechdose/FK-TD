@@ -1,0 +1,94 @@
+#include "renderer.h"
+
+//TODO: Draw projectiles
+
+SDL_Surface* cursorTile;
+SDL_Surface* mapTiles[NUM_MAP_TILES];
+
+SDL_Surface* loadPNG(const char* path)
+{
+    SDL_Surface* loaded = IMG_Load(path);
+    if(loaded != NULL)
+    {
+        SDL_Surface* converted = SDL_DisplayFormatAlpha(loaded);
+        SDL_FreeSurface(loaded);
+        if(converted != NULL)
+        {
+            return converted;
+        }
+    }
+    printf("PNG loading failed for \"%s\".", path);
+    return NULL;
+}
+
+void initRenderer(SDL_Surface* screen)
+{
+    IMG_Init(IMG_INIT_PNG);
+
+    uint8_t i;
+    //Load cursor
+    cursorTile = loadPNG("res/Cursor.png");
+    //Load tiles
+    char mapTilePath[] = "res/tiles/Tile_0.png";
+    for(i = 0; i < NUM_MAP_TILES; i++)
+    {
+        mapTilePath[15] = '0' + i; //Set tile index dynamically
+        mapTiles[i] = loadPNG(mapTilePath);
+    }
+    //Load towers
+    for(i = 0; i < NUM_TOWER_TYPES; i++)
+    {
+        towerTypes[i].tile = loadPNG(towerTypes[i].tilePath);
+    }
+    //Load enemies
+    for(i = 0; i < NUM_ENEMY_TYPES; i++)
+    {
+        enemyTypes[i].tile = loadPNG(enemyTypes[i].tilePath);
+    }
+}
+
+void drawMap(SDL_Surface* screen, Map* map)
+{
+    uint8_t i, j;
+    for(i = 0; i < 15; i++)
+    {
+        for(j = 0; j < 12; j++)
+        {
+            SDL_Rect pos = {.x = i * 16, .y = j * 16};
+            SDL_BlitSurface(mapTiles[map->tiles[i + j * 15]], NULL, screen, &pos);
+        }
+    }
+}
+
+void drawTowers(SDL_Surface* screen, Tower towers[])
+{
+    uint8_t i;
+    for(i = 0; i < 225; i++)
+    {
+        if(towers[i].type)
+        {
+            SDL_Rect pos = {.x = towers[i].position.x, .y = towers[i].position.y};
+            SDL_BlitSurface(towers[i].type->tile, NULL, screen, &pos);
+        }
+    }
+}
+
+void drawEnemies(SDL_Surface* screen, Enemy enemies[])
+{
+    uint8_t i;
+    for(i = 0; i < 225; i++)
+    {
+        if(enemies[i].type)
+        {
+            SDL_Rect pos = {.x = enemies[i].position.x, .y = enemies[i].position.y};
+            SDL_BlitSurface(enemies[i].type->tile, NULL, screen, &pos);
+            //TODO: Draw effects on top
+        }
+    }
+}
+
+void drawCursor(SDL_Surface* screen, Point* cursor)
+{
+    SDL_Rect pos = {.x = cursor->x, .y = cursor->y};
+    SDL_BlitSurface(cursorTile, NULL, screen, &pos);
+}
