@@ -174,7 +174,7 @@ int main(int argc, char **argv)
         drawMap(screen, &maps[0]);
         drawTowers(screen, towers);
         //TODO: Enemies
-        drawHUD(screen);
+        drawHUD(screen, money);
         drawCursor(screen, &cursor, cursorMode, selectedTower);
         SDL_Flip(screen);
         SDL_framerateDelay(&fpsManager);

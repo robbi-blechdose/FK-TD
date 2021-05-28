@@ -76,7 +76,7 @@ void drawTowers(SDL_Surface* screen, Tower towers[])
     {
         if(towers[i].type)
         {
-            SDL_Rect pos = {.x = towers[i].position.x, .y = towers[i].position.y};
+            SDL_Rect pos = {.x = towers[i].position.x * 16, .y = towers[i].position.y * 16};
             SDL_BlitSurface(towers[i].type->tile, NULL, screen, &pos);
         }
     }
@@ -96,15 +96,25 @@ void drawEnemies(SDL_Surface* screen, Enemy enemies[])
     }
 }
 
-void drawHUD(SDL_Surface* screen)
+void drawHUD(SDL_Surface* screen, uint16_t money)
 {
+    boxRGBA(screen, 0, 12 * 16, 240, 240, 160, 82, 40, 255);
+
     uint8_t i;
+    char buffer[16];
+
     for(i = 0; i < NUM_TOWER_TYPES; i++)
     {
         SDL_BlitSurface(hudElements[i].tower->tile, NULL, screen, &hudElements[i].position);
-        stringRGBA(screen, hudElements[i].position.x + 16, hudElements[i].position.y + 4,
+        stringRGBA(screen, hudElements[i].position.x + 16, hudElements[i].position.y,
             hudElements[i].name, 255, 255, 255, 255);
+        sprintf(buffer, "%d$", hudElements[i].tower->cost);
+        stringRGBA(screen, hudElements[i].position.x + 16, hudElements[i].position.y + 8,
+            buffer, 255, 255, 255, 255);
     }
+
+    sprintf(buffer, "%d$", money);
+    stringRGBA(screen, 0, 230, buffer, 255, 255, 255, 255);
 }
 
 void drawCursor(SDL_Surface* screen, Point* cursor, uint8_t cursorMode, TowerType* selectedTower)
