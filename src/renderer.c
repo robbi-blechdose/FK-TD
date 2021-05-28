@@ -5,6 +5,13 @@
 SDL_Surface* cursorTile;
 SDL_Surface* mapTiles[NUM_MAP_TILES];
 
+#define HUD_X_LENGTH 2
+
+HUDElement hudElements[2] = {
+    {.tower = &towerTypes[0], .position = {.x = 0, .y = 12 * 16}, .name = "Gun"},
+    {.tower = &towerTypes[1], .position = {.x = 48, .y = 12 * 16}, .name = "Ice"}
+};
+
 SDL_Surface* loadPNG(const char* path)
 {
     SDL_Surface* loaded = IMG_Load(path);
@@ -17,7 +24,7 @@ SDL_Surface* loadPNG(const char* path)
             return converted;
         }
     }
-    printf("PNG loading failed for \"%s\".", path);
+    printf("PNG loading failed for \"%s\".\n", path);
     return NULL;
 }
 
@@ -45,6 +52,8 @@ void initRenderer(SDL_Surface* screen)
     {
         enemyTypes[i].tile = loadPNG(enemyTypes[i].tilePath);
     }
+    //Load font
+    gfxPrimitivesSetFont(gfxPrimitivesFontdata, 8, 8);
 }
 
 void drawMap(SDL_Surface* screen, Map* map)
@@ -87,8 +96,38 @@ void drawEnemies(SDL_Surface* screen, Enemy enemies[])
     }
 }
 
-void drawCursor(SDL_Surface* screen, Point* cursor)
+void drawHUD(SDL_Surface* screen)
 {
-    SDL_Rect pos = {.x = cursor->x, .y = cursor->y};
-    SDL_BlitSurface(cursorTile, NULL, screen, &pos);
+    uint8_t i;
+    for(i = 0; i < NUM_TOWER_TYPES; i++)
+    {
+        SDL_BlitSurface(hudElements[i].tower->tile, NULL, screen, &hudElements[i].position);
+        stringRGBA(screen, hudElements[i].position.x + 16, hudElements[i].position.y + 4,
+            hudElements[i].name, 255, 255, 255, 255);
+    }
+}
+
+void drawCursor(SDL_Surface* screen, Point* cursor, uint8_t cursorMode, TowerType* selectedTower)
+{
+    if(cursorMode == CURSOR_MAP)
+    {
+        SDL_Rect pos = {.x = cursor->x * 16, .y = cursor->y * 16};
+        if(selectedTower)
+        {
+            SDL_BlitSurface(selectedTower->tile, NULL, screen, &pos);
+        }
+        SDL_BlitSurface(cursorTile, NULL, screen, &pos);
+    }
+    else
+    {
+        uint8_t index = cursor->x + cursor->y * HUD_X_LENGTH;
+        SDL_Rect pos = {.x = hudElements[index].position.x, .y = hudElements[index].position.y};
+        SDL_BlitSurface(cursorTile, NULL, screen, &pos);
+    }
+}
+
+TowerType* getSelectedTower(Point* cursor)
+{
+    uint8_t index = cursor->x + cursor->y * HUD_X_LENGTH;
+    return hudElements[index].tower;
 }

@@ -21,6 +21,8 @@ Enemy enemies[MAX_ENEMIES];
 uint16_t money;
 TowerType* selectedTower;
 
+uint8_t cursorMode;
+Point cursorBackup;
 Point cursor;
 
 void handleInput()
@@ -33,15 +35,25 @@ void handleInput()
             {
                 if(cursor.y > 0)
                 {
-                    cursor.y -= 16;
+                    cursor.y--;
                 }
                 break;
             }
             case SDLK_d:
             {
-                if(cursor.y < 176)
+                if(cursorMode == CURSOR_MAP)
                 {
-                    cursor.y += 16;
+                    if(cursor.y < 11)
+                    {
+                        cursor.y++;
+                    }
+                }
+                else
+                {
+                    if(cursor.y < 0)
+                    {
+                        cursor.y++;
+                    }
                 }
                 break;
             }
@@ -49,22 +61,31 @@ void handleInput()
             {
                 if(cursor.x > 0)
                 {
-                    cursor.x -= 16;
+                    cursor.x--;
                 }
                 break;
             }
             case SDLK_r:
             {
-                if(cursor.x < 224)
+                if(cursorMode == CURSOR_MAP)
                 {
-                    cursor.x += 16;
+                    if(cursor.x < 14)
+                    {
+                        cursor.x++;
+                    }
+                }
+                else
+                {
+                    if(cursor.x < 1)
+                    {
+                        cursor.x++;
+                    }
                 }
                 break;
             }
             case SDLK_a:
             {
-                //if we have a tower selected
-                if(selectedTower)
+                if(cursorMode == CURSOR_MAP && selectedTower)
                 {
                     if(money >= selectedTower->cost && placeTower(&cursor, towers, selectedTower))
                     {
@@ -76,6 +97,37 @@ void handleInput()
                     {
                         //TODO: Play "not placed" sound
                     }
+                }
+                else
+                {
+                    selectedTower = getSelectedTower(&cursor);
+                    //TODO: Play "selected" sound
+                }
+                break;
+            }
+            case SDLK_b:
+            {
+                if(selectedTower)
+                {
+                    selectedTower = NULL;
+                }
+                break;
+            }
+            case SDLK_k:
+            {
+                //Swap cursors
+                Point temp;
+                copyPoint(&temp, &cursor);
+                copyPoint(&cursor, &cursorBackup);
+                copyPoint(&cursorBackup, &temp);
+
+                if(cursorMode == CURSOR_MAP)
+                {
+                    cursorMode = CURSOR_HUD;
+                }
+                else
+                {
+                    cursorMode = CURSOR_MAP;
                 }
                 break;
             }
@@ -122,7 +174,8 @@ int main(int argc, char **argv)
         drawMap(screen, &maps[0]);
         drawTowers(screen, towers);
         //TODO: Enemies
-        drawCursor(screen, &cursor);
+        drawHUD(screen);
+        drawCursor(screen, &cursor, cursorMode, selectedTower);
         SDL_Flip(screen);
         SDL_framerateDelay(&fpsManager);
     }

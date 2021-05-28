@@ -54,5 +54,6 @@ extern EnemyType enemyTypes[NUM_ENEMY_TYPES];
 int placeTower(Point* cursor, Tower towers[], TowerType* new);
 
 void updateTowers(Tower towers[]);
+void updateEnemies(Enemy enemies[]);
 
 #endif

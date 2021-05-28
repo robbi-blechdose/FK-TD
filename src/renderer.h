@@ -3,14 +3,27 @@
 
 #include <SDL.h>
 #include <SDL_image.h>
+#include <SDL_gfxPrimitives.h>
+#include <SDL_gfxPrimitives_font.h>
 #include "entities.h"
 #include "utils.h"
 #include "map.h"
+
+typedef struct {
+    TowerType *tower;
+    SDL_Rect position;
+    char* name;
+} HUDElement;
+
+#define CURSOR_MAP 0
+#define CURSOR_HUD 1
 
 void initRenderer(SDL_Surface* screen);
 void drawMap(SDL_Surface* screen, Map* map);
 void drawTowers(SDL_Surface* screen, Tower towers[]);
 void drawEnemies(SDL_Surface* screen, Enemy enemies[]);
-void drawCursor(SDL_Surface* screen, Point* cursor);
+void drawHUD(SDL_Surface* screen);
+void drawCursor(SDL_Surface* screen, Point* cursors, uint8_t cursorMode, TowerType* selectedTower);
+TowerType* getSelectedTower(Point* cursor);
 
 #endif

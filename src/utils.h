@@ -8,4 +8,6 @@ typedef struct {
     uint8_t y;
 } Point;
 
+void copyPoint(Point* dst, Point* src);
+
 #endif

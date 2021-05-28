@@ -2,7 +2,7 @@
 
 TowerType towerTypes[NUM_TOWER_TYPES] = {
     {.cooldown = 25, .damage = 1, .effect = NONE, .tilePath = "res/towers/Tower_Gun.png"},
-    {.cooldown = 50, .damage = 0, .effect = ICE, .tilePath = "res/towers/Tower_ICE.png"}
+    {.cooldown = 50, .damage = 0, .effect = ICE, .tilePath = "res/towers/Tower_Ice.png"}
 };
 
 EnemyType enemyTypes[NUM_ENEMY_TYPES] = {
