@@ -4,6 +4,7 @@
 #include <SDL.h>
 #include <stdint.h>
 #include "utils.h"
+#include "map.h"
 
 typedef enum {
     NONE,
@@ -42,6 +43,8 @@ typedef struct {
     EnemyType* type;
 
     Point position;
+    uint8_t direction;
+    uint8_t toMove;
     uint16_t health;
 } Enemy;
 
@@ -53,7 +56,9 @@ extern EnemyType enemyTypes[NUM_ENEMY_TYPES];
 
 int placeTower(Point* cursor, Tower towers[], TowerType* new);
 
+int addEnemy(Enemy enemies[], uint8_t x, uint8_t y, uint8_t dir, EnemyType* new);
+
 void updateTowers(Tower towers[]);
-void updateEnemies(Enemy enemies[]);
+void updateEnemies(Enemy enemies[], Map* map);
 
 #endif

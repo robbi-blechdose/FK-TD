@@ -17,3 +17,26 @@ Map maps[1] = {
         G, G, G, G, G, G, G, G, G, G, G, G, G, G, G}
     }
 };
+
+Tile getTileAtPos(Map* map, uint8_t x, uint8_t y)
+{
+    return map->tiles[x + y * MAP_WIDTH];
+}
+
+uint8_t tileIsPath(Map* map, uint8_t x, uint8_t y)
+{
+    if(getTileAtPos(map, x, y) == P || getTileAtPos(map, x, y) == E)
+    {
+        return 1;
+    }
+    return 0;
+}
+
+uint8_t tileIsEnd(Map* map, uint8_t x, uint8_t y)
+{
+    if(getTileAtPos(map, x, y) == E)
+    {
+        return 1;
+    }
+    return 0;
+}

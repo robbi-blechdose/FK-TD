@@ -4,6 +4,7 @@
 #include "renderer.h"
 #include "entities.h"
 #include "utils.h"
+#include "wavegenerator.h"
 
 uint8_t running = 1;
 SDL_Event event;
@@ -168,12 +169,13 @@ int main(int argc, char **argv)
 
         //Update
         updateTowers(towers);
-        updateEnemies(enemies);
+        updateEnemies(enemies, &maps[0]);
+        updateWaveGenerator(enemies);
 
         //Draw
         drawMap(screen, &maps[0]);
         drawTowers(screen, towers);
-        //TODO: Enemies
+        drawEnemies(screen, enemies);
         drawHUD(screen, money);
         drawCursor(screen, &cursor, cursorMode, selectedTower);
         SDL_Flip(screen);

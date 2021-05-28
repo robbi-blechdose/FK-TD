@@ -41,6 +41,31 @@ int placeTower(Point* cursor, Tower towers[], TowerType* new)
     return 0;
 }
 
+int addEnemy(Enemy enemies[], uint8_t x, uint8_t y, uint8_t dir, EnemyType* new)
+{
+    uint8_t i;
+    uint8_t free = 255;
+    for(i = 0; i < 225; i++)
+    {
+        if(!enemies[i].type)
+        {
+            free = i;
+            break;
+        }
+    }
+
+    if(free != 255)
+    {
+        //We found a spot, place the tower
+        enemies[free].type = new;
+        enemies[free].position.x = x;
+        enemies[free].position.y = y;
+        enemies[free].direction = dir;
+        return 1;
+    }
+    return 0;
+}
+
 void updateTowers(Tower towers[])
 {
     uint8_t i;
@@ -61,7 +86,71 @@ void updateTowers(Tower towers[])
     }
 }
 
-void updateEnemies(Enemy enemies[])
+void updateEnemies(Enemy enemies[], Map* map)
 {
-    //TODO
+    uint8_t i;
+    for(i = 0; i < 225; i++)
+    {
+        if(enemies[i].type)
+        {
+            uint8_t dir = enemies[i].direction;
+            uint8_t x = enemies[i].position.x / 16;
+            uint8_t y = enemies[i].position.y / 16;
+            //Check all directions
+            if(!enemies[i].toMove)
+            {
+                if(tileIsEnd(map, x, y))
+                {
+                    //TODO: -1 life
+                    enemies[i].type = NULL;
+                    continue;
+                }
+                else if(tileIsPath(map, x, y - 1) && dir != 1)
+                {
+                    enemies[i].direction = 0;
+                    enemies[i].toMove = 16;
+                }
+                else if(tileIsPath(map, x, y + 1) && dir != 0)
+                {
+                    enemies[i].direction = 1;
+                    enemies[i].toMove = 16;
+                }
+                else if(tileIsPath(map, x - 1, y) && dir != 3)
+                {
+                    enemies[i].direction = 2;
+                    enemies[i].toMove = 16;
+                }
+                else if(tileIsPath(map, x + 1, y) && dir != 2)
+                {
+                    enemies[i].direction = 3;
+                    enemies[i].toMove = 16;
+                }
+            }
+
+            enemies[i].toMove -= enemies[i].type->speed;
+            switch(enemies[i].direction)
+            {
+                case 0:
+                {
+                    enemies[i].position.y -= enemies[i].type->speed;
+                    break;
+                }
+                case 1:
+                {
+                    enemies[i].position.y += enemies[i].type->speed;
+                    break;
+                }
+                case 2:
+                {
+                    enemies[i].position.x -= enemies[i].type->speed;
+                    break;
+                }
+                case 3:
+                {
+                    enemies[i].position.x += enemies[i].type->speed;
+                    break;
+                }
+            }
+        }
+    }
 }
