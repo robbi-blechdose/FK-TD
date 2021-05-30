@@ -1,8 +1,9 @@
 #include "entities.h"
+#include "effects.h"
 
 TowerType towerTypes[NUM_TOWER_TYPES] = {
-    {.cost = 50, .cooldown = 25, .damage = 1, .effect = NONE, .tilePath = "res/towers/Tower_Gun.png"},
-    {.cost = 100, .cooldown = 50, .damage = 0, .effect = ICE, .tilePath = "res/towers/Tower_Ice.png"}
+    {.cost = 50, .cooldown = 50, .damage = 1, .radius = 2, .tilePath = "res/towers/Tower_Zap.png"},
+    {.cost = 100, .cooldown = 50, .damage = 0, .radius = 2, .tilePath = "res/towers/Tower_Ice.png"}
 };
 
 EnemyType enemyTypes[NUM_ENEMY_TYPES] = {
@@ -61,14 +62,15 @@ int addEnemy(Enemy enemies[], uint8_t x, uint8_t y, uint8_t dir, EnemyType* new)
         enemies[free].position.x = x;
         enemies[free].position.y = y;
         enemies[free].direction = dir;
+        enemies[free].health = new->health;
         return 1;
     }
     return 0;
 }
 
-void updateTowers(Tower towers[])
+void updateTowers(Tower towers[], Enemy enemies[])
 {
-    uint8_t i;
+    uint8_t i, j;
     for(i = 0; i < 225; i++)
     {
         if(towers[i].type)
@@ -79,29 +81,55 @@ void updateTowers(Tower towers[])
             }
             else
             {
-                towers[i].cooldown = towers[i].type->cooldown;
-                //TODO: Fire (check which enemies are in range etc.)
+                uint8_t radius = towers[i].type->radius;
+                uint16_t damage = towers[i].type->damage;
+
+                for(j = 0; j < 225; j++)
+                {
+                    if(enemies[j].type)
+                    {
+                        if(distanceTE(&enemies[j].position, &towers[i].position) <= radius)
+                        {
+                            addEffect(ZAP, &towers[i].position, &enemies[j].position);
+                            enemies[j].health -= damage;
+                            towers[i].cooldown = towers[i].type->cooldown;
+                            break;
+                        }
+                    }
+                }
             }
         }
     }
 }
 
-void updateEnemies(Enemy enemies[], Map* map)
+uint8_t updateEnemies(Enemy enemies[], Map* map, uint8_t* lives)
 {
     uint8_t i;
+    uint8_t hasEnemies = 0;
     for(i = 0; i < 225; i++)
     {
         if(enemies[i].type)
         {
+            hasEnemies = 1;
+
             uint8_t dir = enemies[i].direction;
             uint8_t x = enemies[i].position.x / 16;
             uint8_t y = enemies[i].position.y / 16;
+
+            //TODO: Check and fix pathfinding bug
+            //Check health
+            if(!enemies[i].health)
+            {
+                enemies[i].type = NULL;
+                continue;
+            }
+
             //Check all directions
             if(!enemies[i].toMove)
             {
                 if(tileIsEnd(map, x, y))
                 {
-                    //TODO: -1 life
+                    (*lives)--;
                     enemies[i].type = NULL;
                     continue;
                 }
@@ -153,4 +181,6 @@ void updateEnemies(Enemy enemies[], Map* map)
             }
         }
     }
+
+    return hasEnemies;
 }

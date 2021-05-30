@@ -8,7 +8,7 @@ SDL_Surface* mapTiles[NUM_MAP_TILES];
 #define HUD_X_LENGTH 2
 
 HUDElement hudElements[2] = {
-    {.tower = &towerTypes[0], .position = {.x = 0, .y = 12 * 16}, .name = "Gun"},
+    {.tower = &towerTypes[0], .position = {.x = 0, .y = 12 * 16}, .name = "Zap"},
     {.tower = &towerTypes[1], .position = {.x = 48, .y = 12 * 16}, .name = "Ice"}
 };
 
@@ -96,12 +96,12 @@ void drawEnemies(SDL_Surface* screen, Enemy enemies[])
     }
 }
 
-void drawHUD(SDL_Surface* screen, uint16_t money)
+void drawHUD(SDL_Surface* screen, uint16_t wave, uint16_t money, uint8_t lives)
 {
     boxRGBA(screen, 0, 12 * 16, 240, 240, 160, 82, 40, 255);
 
     uint8_t i;
-    char buffer[16];
+    char buffer[64];
 
     for(i = 0; i < NUM_TOWER_TYPES; i++)
     {
@@ -112,8 +112,8 @@ void drawHUD(SDL_Surface* screen, uint16_t money)
         stringRGBA(screen, hudElements[i].position.x + 16, hudElements[i].position.y + 8,
             buffer, 255, 255, 255, 255);
     }
-
-    sprintf(buffer, "%d$", money);
+    //Stats
+    sprintf(buffer, "Wave:%d | %d$ | %d <3", wave, money, lives);
     stringRGBA(screen, 0, 230, buffer, 255, 255, 255, 255);
 }
 

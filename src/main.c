@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <SDL.h>
 #include <SDL_framerate.h>
 
@@ -5,6 +6,7 @@
 #include "entities.h"
 #include "utils.h"
 #include "wavegenerator.h"
+#include "effects.h"
 
 uint8_t running = 1;
 SDL_Event event;
@@ -19,12 +21,22 @@ FPSmanager fpsManager;
 Tower towers[MAX_TOWERS];
 Enemy enemies[MAX_ENEMIES];
 
+uint16_t wave;
+uint8_t waveActive;
 uint16_t money;
+uint8_t lives;
 TowerType* selectedTower;
 
 uint8_t cursorMode;
 Point cursorBackup;
 Point cursor;
+
+void startWave()
+{
+    wave++;
+    waveActive = 1;
+    initWaveGenerator(wave);
+}
 
 void handleInput()
 {
@@ -132,6 +144,14 @@ void handleInput()
                 }
                 break;
             }
+            case SDLK_s:
+            {
+                if(!waveActive)
+                {
+                    startWave();
+                }
+                break;
+            }
             default:
             {
                 break;
@@ -149,10 +169,14 @@ int main(int argc, char **argv)
     //Setup framerate
     SDL_initFramerate(&fpsManager);
     SDL_setFramerate(&fpsManager, 50);
+    srand(time(NULL));
 
     //Init game
-    initRenderer(screen);
+    wave = 0;
+    waveActive = 0;
     money = 100;
+    lives = 50;
+    initRenderer(screen);
 
     //Main loop
     while(running)
@@ -167,17 +191,22 @@ int main(int argc, char **argv)
             handleInput();
         }
 
-        //Update
-        updateTowers(towers);
-        updateEnemies(enemies, &maps[0]);
-        updateWaveGenerator(enemies);
+        if(waveActive)
+        {
+            //Update
+            updateTowers(towers, enemies);
+            uint8_t hasEnemies = updateEnemies(enemies, &maps[0], &lives);
+            uint8_t hasWave = updateWaveGenerator(enemies);
+            waveActive = hasEnemies || hasWave;
+        }
 
         //Draw
         drawMap(screen, &maps[0]);
         drawTowers(screen, towers);
         drawEnemies(screen, enemies);
-        drawHUD(screen, money);
+        drawHUD(screen, wave, money, lives);
         drawCursor(screen, &cursor, cursorMode, selectedTower);
+        drawEffects(screen);
         SDL_Flip(screen);
         SDL_framerateDelay(&fpsManager);
     }

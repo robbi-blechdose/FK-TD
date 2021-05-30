@@ -6,17 +6,10 @@
 #include "utils.h"
 #include "map.h"
 
-typedef enum {
-    NONE,
-    FIRE,
-    ICE,
-    POISON
-} Effect;
-
 typedef struct {
     uint16_t cooldown;
     uint16_t damage;
-    Effect effect;
+    uint8_t radius;
 
     uint16_t cost;
 
@@ -58,7 +51,7 @@ int placeTower(Point* cursor, Tower towers[], TowerType* new);
 
 int addEnemy(Enemy enemies[], uint8_t x, uint8_t y, uint8_t dir, EnemyType* new);
 
-void updateTowers(Tower towers[]);
-void updateEnemies(Enemy enemies[], Map* map);
+void updateTowers(Tower towers[], Enemy enemies[]);
+uint8_t updateEnemies(Enemy enemies[], Map* map, uint8_t* lives);
 
 #endif
