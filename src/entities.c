@@ -7,7 +7,9 @@ TowerType towerTypes[NUM_TOWER_TYPES] = {
 };
 
 EnemyType enemyTypes[NUM_ENEMY_TYPES] = {
-    {.health = 1, .speed = 1, .tilePath = "res/enemies/Enemy_0.png"}
+    {.health = 1, .speed = 1, .tilePath = "res/enemies/Enemy_0.png", .contains = NULL},
+    {.health = 2, .speed = 1, .tilePath = "res/enemies/Enemy_1.png", .contains = &enemyTypes[0]},
+    {.health = 3, .speed = 2, .tilePath = "res/enemies/Enemy_2.png", .contains = &enemyTypes[1]}
 };
 
 int placeTower(Point* cursor, Tower towers[], TowerType* new)
@@ -62,13 +64,28 @@ int addEnemy(Enemy enemies[], uint8_t x, uint8_t y, uint8_t dir, EnemyType* new)
         enemies[free].position.x = x;
         enemies[free].position.y = y;
         enemies[free].direction = dir;
+        enemies[free].toMove = 0;
         enemies[free].health = new->health;
         return 1;
     }
     return 0;
 }
 
-void updateTowers(Tower towers[], Enemy enemies[])
+void damageEnemy(Enemy enemies[], Enemy* e, uint16_t damage, uint16_t* money)
+{
+    if(e->health > damage)
+    {
+        e->health -= damage;
+        e->type = e->type->contains;
+    }
+    else
+    {
+        e->type = NULL;
+        (*money)++;
+    }
+}
+
+void updateTowers(Tower towers[], Enemy enemies[], uint16_t* money)
 {
     uint8_t i, j;
     for(i = 0; i < 225; i++)
@@ -91,7 +108,7 @@ void updateTowers(Tower towers[], Enemy enemies[])
                         if(distanceTE(&enemies[j].position, &towers[i].position) <= radius)
                         {
                             addEffect(ZAP, &towers[i].position, &enemies[j].position);
-                            enemies[j].health -= damage;
+                            damageEnemy(enemies, &enemies[j], damage, money);
                             towers[i].cooldown = towers[i].type->cooldown;
                             break;
                         }
@@ -102,7 +119,7 @@ void updateTowers(Tower towers[], Enemy enemies[])
     }
 }
 
-uint8_t updateEnemies(Enemy enemies[], Map* map, uint8_t* lives)
+uint8_t updateEnemies(Enemy enemies[], Map* map, uint8_t* lives, uint16_t* money)
 {
     uint8_t i;
     uint8_t hasEnemies = 0;
@@ -112,45 +129,21 @@ uint8_t updateEnemies(Enemy enemies[], Map* map, uint8_t* lives)
         {
             hasEnemies = 1;
 
-            uint8_t dir = enemies[i].direction;
             uint8_t x = enemies[i].position.x / 16;
             uint8_t y = enemies[i].position.y / 16;
-
-            //TODO: Check and fix pathfinding bug
-            //Check health
-            if(!enemies[i].health)
-            {
-                enemies[i].type = NULL;
-                continue;
-            }
 
             //Check all directions
             if(!enemies[i].toMove)
             {
                 if(tileIsEnd(map, x, y))
                 {
-                    (*lives)--;
+                    (*lives) -= enemies[i].health;
                     enemies[i].type = NULL;
                     continue;
                 }
-                else if(tileIsPath(map, x, y - 1) && dir != 1)
+                else
                 {
-                    enemies[i].direction = 0;
-                    enemies[i].toMove = 16;
-                }
-                else if(tileIsPath(map, x, y + 1) && dir != 0)
-                {
-                    enemies[i].direction = 1;
-                    enemies[i].toMove = 16;
-                }
-                else if(tileIsPath(map, x - 1, y) && dir != 3)
-                {
-                    enemies[i].direction = 2;
-                    enemies[i].toMove = 16;
-                }
-                else if(tileIsPath(map, x + 1, y) && dir != 2)
-                {
-                    enemies[i].direction = 3;
+                    enemies[i].direction = getTileAtPos(map, x, y) - 4;
                     enemies[i].toMove = 16;
                 }
             }

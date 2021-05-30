@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "wavegenerator.h"
 
 uint16_t timer;
@@ -8,7 +9,7 @@ void initWaveGenerator(uint8_t wave)
     rcount = 12 * wave;
 }
 
-uint8_t updateWaveGenerator(Enemy enemies[])
+uint8_t updateWaveGenerator(Enemy enemies[], uint8_t wave)
 {
     if(rcount == 0)
     {
@@ -20,7 +21,8 @@ uint8_t updateWaveGenerator(Enemy enemies[])
     if(timer == 24)
     {
         timer = 0;
-        addEnemy(enemies, 16, 16, 1, &enemyTypes[0]);
+        uint8_t enemyIndex = (rand() % (wave * 100)) / 100;
+        addEnemy(enemies, 16, 16, 1, &enemyTypes[enemyIndex]);
         rcount--;
     }
     return 1;

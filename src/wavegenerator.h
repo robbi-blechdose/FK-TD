@@ -4,6 +4,6 @@
 #include "entities.h"
 
 void initWaveGenerator(uint8_t wave);
-uint8_t updateWaveGenerator(Enemy enemies[]);
+uint8_t updateWaveGenerator(Enemy enemies[], uint8_t wave);
 
 #endif

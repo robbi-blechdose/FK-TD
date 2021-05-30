@@ -4,9 +4,10 @@
 #include <stdint.h>
 #include <SDL/SDL.h>
 
-#define NUM_MAP_TILES 5
+#define NUM_MAP_TILES 8
 typedef enum {
-    G, W, P, S, E
+    G, W, S, E,
+    U, D, L, R
 } Tile;
 
 #define MAP_WIDTH  15
@@ -18,7 +19,7 @@ typedef struct {
 
 extern Map maps[1];
 
-uint8_t tileIsPath(Map* map, uint8_t x, uint8_t y);
+Tile getTileAtPos(Map* map, uint8_t x, uint8_t y);
 uint8_t tileIsEnd(Map* map, uint8_t x, uint8_t y);
 
 #endif

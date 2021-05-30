@@ -24,13 +24,15 @@ typedef struct {
     uint16_t cooldown;
 } Tower;
 
-typedef struct {
+typedef struct EnemyType EnemyType;
+struct EnemyType {
     uint16_t health;
     uint16_t speed;
+    EnemyType* contains;
 
     char* tilePath;
     SDL_Surface* tile;
-} EnemyType;
+};
 
 typedef struct {
     EnemyType* type;
@@ -44,14 +46,14 @@ typedef struct {
 #define NUM_TOWER_TYPES 2
 extern TowerType towerTypes[NUM_TOWER_TYPES];
 
-#define NUM_ENEMY_TYPES 1
+#define NUM_ENEMY_TYPES 3
 extern EnemyType enemyTypes[NUM_ENEMY_TYPES];
 
 int placeTower(Point* cursor, Tower towers[], TowerType* new);
 
 int addEnemy(Enemy enemies[], uint8_t x, uint8_t y, uint8_t dir, EnemyType* new);
 
-void updateTowers(Tower towers[], Enemy enemies[]);
-uint8_t updateEnemies(Enemy enemies[], Map* map, uint8_t* lives);
+void updateTowers(Tower towers[], Enemy enemies[], uint16_t* money);
+uint8_t updateEnemies(Enemy enemies[], Map* map, uint8_t* lives, uint16_t* money);
 
 #endif

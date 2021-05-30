@@ -103,7 +103,6 @@ void handleInput()
                     if(money >= selectedTower->cost && placeTower(&cursor, towers, selectedTower))
                     {
                         money -= selectedTower->cost;
-                        selectedTower = 0;
                         //TODO: Play "placed" sound
                     }
                     else
@@ -160,6 +159,8 @@ void handleInput()
     }
 }
 
+//TODO: Move all stuff into a main game object so we can pass that around as a pointer
+
 int main(int argc, char **argv)
 {
     //Setup SDL
@@ -194,9 +195,9 @@ int main(int argc, char **argv)
         if(waveActive)
         {
             //Update
-            updateTowers(towers, enemies);
-            uint8_t hasEnemies = updateEnemies(enemies, &maps[0], &lives);
-            uint8_t hasWave = updateWaveGenerator(enemies);
+            updateTowers(towers, enemies, &money);
+            uint8_t hasEnemies = updateEnemies(enemies, &maps[0], &lives, &money);
+            uint8_t hasWave = updateWaveGenerator(enemies, wave);
             waveActive = hasEnemies || hasWave;
         }
 

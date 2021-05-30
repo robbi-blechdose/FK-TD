@@ -91,7 +91,6 @@ void drawEnemies(SDL_Surface* screen, Enemy enemies[])
         {
             SDL_Rect pos = {.x = enemies[i].position.x, .y = enemies[i].position.y};
             SDL_BlitSurface(enemies[i].type->tile, NULL, screen, &pos);
-            //TODO: Draw effects on top
         }
     }
 }
