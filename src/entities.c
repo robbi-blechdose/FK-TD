@@ -1,9 +1,8 @@
 #include "entities.h"
-#include "effects.h"
 
 TowerType towerTypes[NUM_TOWER_TYPES] = {
-    {.cost = 50, .cooldown = 50, .damage = 1, .radius = 2, .tilePath = "res/towers/Tower_Zap.png"},
-    {.cost = 100, .cooldown = 50, .damage = 0, .radius = 2, .tilePath = "res/towers/Tower_Ice.png"}
+    {.cost = 50, .cooldown = 50, .damage = 1, .radius = 2, .tilePath = "res/towers/Tower_Zap.png", .attack = ZAP},
+    {.cost = 100, .cooldown = 50, .damage = 1, .radius = 2, .tilePath = "res/towers/Tower_Ice.png", .attack = ICE}
 };
 
 EnemyType enemyTypes[NUM_ENEMY_TYPES] = {
@@ -100,17 +99,34 @@ void updateTowers(Tower towers[], Enemy enemies[], uint16_t* money)
             {
                 uint8_t radius = towers[i].type->radius;
                 uint16_t damage = towers[i].type->damage;
+                uint8_t fired = 0;
 
+                //TODO: Fire on enemies in order (at first enemy in range!) -> maybe with an enemy index as attribute?
                 for(j = 0; j < 225; j++)
                 {
                     if(enemies[j].type)
                     {
                         if(distanceTE(&enemies[j].position, &towers[i].position) <= radius)
                         {
-                            addEffect(ZAP, &towers[i].position, &enemies[j].position);
-                            damageEnemy(enemies, &enemies[j], damage, money);
-                            towers[i].cooldown = towers[i].type->cooldown;
-                            break;
+                            if(!fired)
+                            {
+                                addEffect(towers[i].type->attack, &towers[i].position, &enemies[j].position,
+                                    towers[i].type->radius);
+                                towers[i].cooldown = towers[i].type->cooldown;
+                            }
+
+                            if(towers[i].type->attack == ZAP)
+                            {
+                                damageEnemy(enemies, &enemies[j], damage, money);
+                                //ZAP can only fire at one enemy, we're done
+                                break;
+                            }
+                            else if(towers[i].type->attack == ICE)
+                            {
+                                damageEnemy(enemies, &enemies[j], damage, money);
+                                //Keep going, but don't add multiple effects
+                                fired = 1;
+                            }
                         }
                     }
                 }

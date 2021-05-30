@@ -5,8 +5,10 @@
 #include <stdint.h>
 #include "utils.h"
 #include "map.h"
+#include "effects.h"
 
 typedef struct {
+    EffectType attack;
     uint16_t cooldown;
     uint16_t damage;
     uint8_t radius;

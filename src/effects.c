@@ -2,7 +2,7 @@
 
 Effect effects[255];
 
-void addEffect(EffectType t, Point* tower, Point* enemy)
+void addEffect(EffectType t, Point* tower, Point* enemy, uint8_t radius)
 {
     uint8_t i;
     for(i = 0; i < 255; i++)
@@ -11,6 +11,7 @@ void addEffect(EffectType t, Point* tower, Point* enemy)
         {
             effects[i].type = t;
             effects[i].timer = 5;
+            effects[i].radius = radius * 16;
             effects[i].a.x = tower->x * 16 + 8;
             effects[i].a.y = tower->y * 16 + 8;
             effects[i].b.x = enemy->x + 8;
@@ -35,17 +36,25 @@ void drawEffects(SDL_Surface* screen)
                 uint8_t my = effects[i].middle.y + (rand() % 16 - 8);
                 thickLineRGBA(screen, effects[i].a.x, effects[i].a.y, mx, my, 2, 0, 170, 255, 255);
                 thickLineRGBA(screen, mx, my, effects[i].b.x, effects[i].b.y, 2, 0, 170, 255, 255);
-                effects[i].timer--;
-                if(!effects[i].timer)
-                {
-                    effects[i].type = NONE;
-                }
+                break;
+            }
+            case ICE:
+            {
+                circleRGBA(screen, effects[i].a.x, effects[i].a.y, effects[i].radius + (rand() % 8 - 4),
+                            0, 255, 255, 255);
+                circleRGBA(screen, effects[i].a.x, effects[i].a.y, effects[i].radius - 4 + (rand() % 8 - 4),
+                            0, 200, 255, 255);
                 break;
             }
             default:
             {
                 break;
             }
+        }
+        effects[i].timer--;
+        if(!effects[i].timer)
+        {
+            effects[i].type = NONE;
         }
     }
 }
