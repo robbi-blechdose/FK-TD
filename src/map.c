@@ -10,9 +10,9 @@ Map maps[1] = {
         G, D, G, R, R, R, D, G, G, G, G, G, U, G, G,
         G, D, G, U, G, G, D, G, G, G, G, G, U, L, G,
         G, D, G, U, G, G, D, G, G, G, G, G, G, U, G,
-        G, D, G, U, G, D, L, G, G, G, G, G, G, U, G,
-        G, D, G, U, G, R, D, G, G, G, G, G, G, U, G,
-        G, D, G, U, G, G, D, G, G, G, G, G, G, U, G,
+        G, D, G, U, G, D, L, G, W, W, W, W, G, U, G,
+        G, D, G, U, G, R, D, G, W, W, W, W, G, U, G,
+        G, D, G, U, G, G, D, G, W, W, W, W, G, U, G,
         G, R, R, U, G, G, R, R, R, R, R, R, R, U, G,
         G, G, G, G, G, G, G, G, G, G, G, G, G, G, G}
     }

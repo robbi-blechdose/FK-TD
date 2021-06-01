@@ -3,7 +3,18 @@
 //TODO: Draw projectiles
 
 SDL_Surface* cursorTile;
-SDL_Surface* mapTiles[NUM_MAP_TILES];
+
+uint8_t animCounter;
+RenderTile renderTiles[NUM_MAP_TILES] = {
+    {.path = "res/tiles/Grass.png", .frames = 0},
+    {.path = "res/tiles/Water.png", .frames = 8},
+    {.path = "res/tiles/Start.png", .frames = 0},
+    {.path = "res/tiles/FunKey_S.png", .frames = 0},
+    {.path = "res/tiles/Up.png", .frames = 0},
+    {.path = "res/tiles/Down.png", .frames = 0},
+    {.path = "res/tiles/Left.png", .frames = 0},
+    {.path = "res/tiles/Right.png", .frames = 0}
+};
 
 #define HUD_X_LENGTH 2
 
@@ -31,6 +42,7 @@ SDL_Surface* loadPNG(const char* path)
 void initRenderer(SDL_Surface* screen)
 {
     IMG_Init(IMG_INIT_PNG);
+    animCounter = 0;
 
     uint8_t i;
     //Load cursor
@@ -39,8 +51,7 @@ void initRenderer(SDL_Surface* screen)
     char mapTilePath[] = "res/tiles/Tile_0.png";
     for(i = 0; i < NUM_MAP_TILES; i++)
     {
-        mapTilePath[15] = '0' + i; //Set tile index dynamically
-        mapTiles[i] = loadPNG(mapTilePath);
+        renderTiles[i].tile = loadPNG(renderTiles[i].path);
     }
     //Load towers
     for(i = 0; i < NUM_TOWER_TYPES; i++)
@@ -59,14 +70,26 @@ void initRenderer(SDL_Surface* screen)
 void drawMap(SDL_Surface* screen, Map* map)
 {
     uint8_t i, j;
+
     for(i = 0; i < 15; i++)
     {
         for(j = 0; j < 12; j++)
         {
             SDL_Rect pos = {.x = i * 16, .y = j * 16};
-            SDL_BlitSurface(mapTiles[map->tiles[i + j * 15]], NULL, screen, &pos);
+            Tile index = map->tiles[i + j * 15];
+            if(renderTiles[index].frames)
+            {
+                SDL_Rect rect = {.x = (animCounter / 16 % renderTiles[index].frames) * 16, .y = 0, .w = 16, .h = 16};
+                SDL_BlitSurface(renderTiles[index].tile, &rect, screen, &pos);
+            }
+            else
+            {
+                SDL_BlitSurface(renderTiles[index].tile, NULL, screen, &pos);
+            }
         }
     }
+
+    animCounter++;
 }
 
 void drawTowers(SDL_Surface* screen, Tower towers[])
@@ -124,6 +147,7 @@ void drawCursor(SDL_Surface* screen, Point* cursor, uint8_t cursorMode, TowerTyp
         if(selectedTower)
         {
             SDL_BlitSurface(selectedTower->tile, NULL, screen, &pos);
+            circleRGBA(screen, cursor->x * 16 + 8, cursor->y * 16 + 8, selectedTower->radius * 16, 255, 255, 255, 255);
         }
         SDL_BlitSurface(cursorTile, NULL, screen, &pos);
     }

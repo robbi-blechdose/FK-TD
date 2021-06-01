@@ -1,8 +1,8 @@
 #include "entities.h"
 
 TowerType towerTypes[NUM_TOWER_TYPES] = {
-    {.cost = 50, .cooldown = 50, .damage = 1, .radius = 2, .tilePath = "res/towers/Tower_Zap.png", .attack = ZAP},
-    {.cost = 100, .cooldown = 50, .damage = 1, .radius = 2, .tilePath = "res/towers/Tower_Ice.png", .attack = ICE}
+    {.cost = 50, .cooldown = 50, .damage = 1, .radius = 2, .tilePath = "res/towers/zap_tower_0.png", .attack = ZAP},
+    {.cost = 100, .cooldown = 50, .damage = 1, .radius = 2, .tilePath = "res/towers/ice_tower_0.png", .attack = ICE}
 };
 
 EnemyType enemyTypes[NUM_ENEMY_TYPES] = {
@@ -123,6 +123,7 @@ void updateTowers(Tower towers[], Enemy enemies[], uint16_t* money)
                             }
                             else if(towers[i].type->attack == ICE)
                             {
+                                //TODO: Slow the enemy down instead of damaging it - or maybe both?
                                 damageEnemy(enemies, &enemies[j], damage, money);
                                 //Keep going, but don't add multiple effects
                                 fired = 1;

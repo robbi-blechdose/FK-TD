@@ -15,6 +15,12 @@ typedef struct {
     char* name;
 } HUDElement;
 
+typedef struct {
+    char* path;
+    uint8_t frames;
+    SDL_Surface* tile;
+} RenderTile;
+
 #define CURSOR_MAP 0
 #define CURSOR_HUD 1
 
