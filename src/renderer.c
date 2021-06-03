@@ -16,28 +16,13 @@ RenderTile renderTiles[NUM_MAP_TILES] = {
     {.path = "res/tiles/Right.png", .frames = 0}
 };
 
-#define HUD_X_LENGTH 2
+#define HUD_X_LENGTH 3
 
-HUDElement hudElements[2] = {
+HUDElement hudElements[3] = {
     {.tower = &towerTypes[0], .position = {.x = 0, .y = 12 * 16}, .name = "Zap"},
-    {.tower = &towerTypes[1], .position = {.x = 48, .y = 12 * 16}, .name = "Ice"}
+    {.tower = &towerTypes[1], .position = {.x = 48, .y = 12 * 16}, .name = "Ice"},
+    {.tower = &towerTypes[2], .position = {.x = 96, .y = 12 * 16}, .name = "Fire"}
 };
-
-SDL_Surface* loadPNG(const char* path)
-{
-    SDL_Surface* loaded = IMG_Load(path);
-    if(loaded != NULL)
-    {
-        SDL_Surface* converted = SDL_DisplayFormatAlpha(loaded);
-        SDL_FreeSurface(loaded);
-        if(converted != NULL)
-        {
-            return converted;
-        }
-    }
-    printf("PNG loading failed for \"%s\".\n", path);
-    return NULL;
-}
 
 void initRenderer(SDL_Surface* screen)
 {
@@ -48,7 +33,6 @@ void initRenderer(SDL_Surface* screen)
     //Load cursor
     cursorTile = loadPNG("res/Cursor.png");
     //Load tiles
-    char mapTilePath[] = "res/tiles/Tile_0.png";
     for(i = 0; i < NUM_MAP_TILES; i++)
     {
         renderTiles[i].tile = loadPNG(renderTiles[i].path);
@@ -100,7 +84,15 @@ void drawTowers(SDL_Surface* screen, Tower towers[])
         if(towers[i].type)
         {
             SDL_Rect pos = {.x = towers[i].position.x * 16, .y = towers[i].position.y * 16};
-            SDL_BlitSurface(towers[i].type->tile, NULL, screen, &pos);
+            if(towers[i].type->frames)
+            {
+                SDL_Rect rect = {.x = (animCounter / 16 % towers[i].type->frames) * 16, .y = 0, .w = 16, .h = 16};
+                SDL_BlitSurface(towers[i].type->tile, &rect, screen, &pos);
+            }
+            else
+            {
+                SDL_BlitSurface(towers[i].type->tile, NULL, screen, &pos);
+            }
         }
     }
 }
@@ -127,7 +119,8 @@ void drawHUD(SDL_Surface* screen, uint16_t wave, uint16_t money, uint8_t lives)
 
     for(i = 0; i < NUM_TOWER_TYPES; i++)
     {
-        SDL_BlitSurface(hudElements[i].tower->tile, NULL, screen, &hudElements[i].position);
+        SDL_Rect rect = {.x = 0, .y = 0, .w = 16, .h = 16};
+        SDL_BlitSurface(hudElements[i].tower->tile, &rect, screen, &hudElements[i].position);
         stringRGBA(screen, hudElements[i].position.x + 16, hudElements[i].position.y,
             hudElements[i].name, 255, 255, 255, 255);
         sprintf(buffer, "%d$", hudElements[i].tower->cost);
@@ -146,7 +139,8 @@ void drawCursor(SDL_Surface* screen, Point* cursor, uint8_t cursorMode, TowerTyp
         SDL_Rect pos = {.x = cursor->x * 16, .y = cursor->y * 16};
         if(selectedTower)
         {
-            SDL_BlitSurface(selectedTower->tile, NULL, screen, &pos);
+            SDL_Rect rect = {.x = 0, .y = 0, .w = 16, .h = 16};
+            SDL_BlitSurface(selectedTower->tile, &rect, screen, &pos);
             circleRGBA(screen, cursor->x * 16 + 8, cursor->y * 16 + 8, selectedTower->radius * 16, 255, 255, 255, 255);
         }
         SDL_BlitSurface(cursorTile, NULL, screen, &pos);

@@ -1,8 +1,12 @@
 #include "entities.h"
 
 TowerType towerTypes[NUM_TOWER_TYPES] = {
-    {.cost = 50, .cooldown = 50, .damage = 1, .radius = 2, .tilePath = "res/towers/zap_tower_0.png", .attack = ZAP},
-    {.cost = 100, .cooldown = 50, .damage = 1, .radius = 2, .tilePath = "res/towers/ice_tower_0.png", .attack = ICE}
+    {.attack = ZAP, .cost = 50, .cooldown = 50, .damage = 1, .radius = 2,
+        .tilePath = "res/towers/zap_tower.png", .frames = 2},
+    {.attack = ICE, .cost = 75, .cooldown = 75, .damage = 1, .radius = 2,
+        .tilePath = "res/towers/ice_tower.png", .frames = 2},
+    {.attack = FIRE, .cost = 100, .cooldown = 10, .damage = 1, .radius = 3,
+        .tilePath = "res/towers/fire_tower.png", .frames = 2}
 };
 
 EnemyType enemyTypes[NUM_ENEMY_TYPES] = {
@@ -128,6 +132,13 @@ void updateTowers(Tower towers[], Enemy enemies[], uint16_t* money)
                                 //Keep going, but don't add multiple effects
                                 fired = 1;
                             }
+                            else if(towers[i].type->attack == FIRE)
+                            {
+                                //TODO: Maybe actually spawn a projectile and see if it hits?
+                                damageEnemy(enemies, &enemies[j], damage, money);
+                                //FIRE can only fire at one enemy, we're done
+                                break;
+                            }
                         }
                     }
                 }
@@ -136,6 +147,7 @@ void updateTowers(Tower towers[], Enemy enemies[], uint16_t* money)
     }
 }
 
+//TODO: Allows speeds slower than 1
 uint8_t updateEnemies(Enemy enemies[], Map* map, uint8_t* lives, uint16_t* money)
 {
     uint8_t i;

@@ -17,6 +17,7 @@ typedef struct {
 
     char* tilePath;
     SDL_Surface* tile;
+    uint8_t frames;
 } TowerType;
 
 typedef struct {
@@ -45,7 +46,7 @@ typedef struct {
     uint16_t health;
 } Enemy;
 
-#define NUM_TOWER_TYPES 2
+#define NUM_TOWER_TYPES 3
 extern TowerType towerTypes[NUM_TOWER_TYPES];
 
 #define NUM_ENEMY_TYPES 3

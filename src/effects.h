@@ -9,7 +9,8 @@
 typedef enum {
     NONE,
     ZAP,
-    ICE
+    ICE,
+    FIRE
 } EffectType;
 
 typedef struct {
@@ -19,6 +20,7 @@ typedef struct {
     uint8_t timer;
 } Effect;
 
+void initEffects();
 void addEffect(EffectType t, Point* tower, Point* enemy, uint8_t radius);
 void drawEffects(SDL_Surface* screen);
 

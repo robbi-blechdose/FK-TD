@@ -89,7 +89,7 @@ void handleInput()
                 }
                 else
                 {
-                    if(cursor.x < 1)
+                    if(cursor.x < 2)
                     {
                         cursor.x++;
                     }
@@ -178,6 +178,7 @@ int main(int argc, char **argv)
     money = 100;
     lives = 50;
     initRenderer(screen);
+    initEffects();
 
     //Main loop
     while(running)

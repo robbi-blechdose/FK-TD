@@ -2,6 +2,13 @@
 
 Effect effects[255];
 
+SDL_Surface* fireball;
+
+void initEffects()
+{
+    fireball = loadPNG("res/effects/fireball.png");
+}
+
 void addEffect(EffectType t, Point* tower, Point* enemy, uint8_t radius)
 {
     uint8_t i;
@@ -46,15 +53,28 @@ void drawEffects(SDL_Surface* screen)
                             0, 200, 255, 255);
                 break;
             }
+            case FIRE:
+            {
+                SDL_Rect rect = {.x = 8 * (effects[i].timer % 2), .y = 0, .w = 8, .h = 8};
+                float diff = effects[i].timer / 5.0f;
+                SDL_Rect pos = {.x = lerp(effects[i].b.x, effects[i].a.x, diff) - 4,
+                                .y = lerp(effects[i].b.y, effects[i].a.y, diff) - 4};
+                SDL_BlitSurface(fireball, &rect, screen, &pos);
+                break;
+            }
             default:
             {
                 break;
             }
         }
-        effects[i].timer--;
-        if(!effects[i].timer)
+
+        if(effects[i].type)
         {
-            effects[i].type = NONE;
+            effects[i].timer--;
+            if(!effects[i].timer)
+            {
+                effects[i].type = NONE;
+            }
         }
     }
 }
