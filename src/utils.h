@@ -4,11 +4,20 @@
 #include <stdint.h>
 #include <math.h>
 #include <SDL.h>
+#include "map.h"
 
 typedef struct {
     uint8_t x;
     uint8_t y;
 } Point;
+
+typedef struct {
+    uint16_t wave;
+    uint8_t waveActive;
+    uint16_t money;
+    uint8_t lives;
+    Map* map;
+} Game;
 
 void copyPoint(Point* dst, Point* src);
 uint8_t distanceTE(Point* enemy, Point* tower);

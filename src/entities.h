@@ -57,6 +57,6 @@ int placeTower(Point* cursor, Tower towers[], TowerType* new);
 int addEnemy(Enemy enemies[], uint8_t x, uint8_t y, uint8_t dir, EnemyType* new);
 
 void updateTowers(Tower towers[], Enemy enemies[], uint16_t* money);
-uint8_t updateEnemies(Enemy enemies[], Map* map, uint8_t* lives, uint16_t* money);
+uint8_t updateEnemies(Enemy enemies[], Map* map, Game* game);
 
 #endif

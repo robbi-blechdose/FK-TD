@@ -148,7 +148,7 @@ void updateTowers(Tower towers[], Enemy enemies[], uint16_t* money)
 }
 
 //TODO: Allows speeds slower than 1
-uint8_t updateEnemies(Enemy enemies[], Map* map, uint8_t* lives, uint16_t* money)
+uint8_t updateEnemies(Enemy enemies[], Map* map, Game* game)
 {
     uint8_t i;
     uint8_t hasEnemies = 0;
@@ -166,7 +166,7 @@ uint8_t updateEnemies(Enemy enemies[], Map* map, uint8_t* lives, uint16_t* money
             {
                 if(tileIsEnd(map, x, y))
                 {
-                    (*lives) -= enemies[i].health;
+                    game->lives -= enemies[i].health;
                     enemies[i].type = NULL;
                     continue;
                 }

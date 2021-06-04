@@ -28,7 +28,7 @@ void initRenderer(SDL_Surface* screen);
 void drawMap(SDL_Surface* screen, Map* map);
 void drawTowers(SDL_Surface* screen, Tower towers[]);
 void drawEnemies(SDL_Surface* screen, Enemy enemies[]);
-void drawHUD(SDL_Surface* screen, uint16_t wave, uint16_t money, uint8_t lives);
+void drawHUD(SDL_Surface* screen, Game* game);
 void drawCursor(SDL_Surface* screen, Point* cursors, uint8_t cursorMode, TowerType* selectedTower);
 TowerType* getSelectedTower(Point* cursor);
 

@@ -110,7 +110,7 @@ void drawEnemies(SDL_Surface* screen, Enemy enemies[])
     }
 }
 
-void drawHUD(SDL_Surface* screen, uint16_t wave, uint16_t money, uint8_t lives)
+void drawHUD(SDL_Surface* screen, Game* game)
 {
     boxRGBA(screen, 0, 12 * 16, 240, 240, 160, 82, 40, 255);
 
@@ -128,7 +128,7 @@ void drawHUD(SDL_Surface* screen, uint16_t wave, uint16_t money, uint8_t lives)
             buffer, 255, 255, 255, 255);
     }
     //Stats
-    sprintf(buffer, "Wave:%d | %d$ | %d <3", wave, money, lives);
+    sprintf(buffer, "Wave:%d | %d$ | %d <3", game->wave, game->money, game->lives);
     stringRGBA(screen, 0, 230, buffer, 255, 255, 255, 255);
 }
 
