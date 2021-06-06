@@ -128,7 +128,14 @@ void drawHUD(SDL_Surface* screen, Game* game)
             buffer, 255, 255, 255, 255);
     }
     //Stats
-    sprintf(buffer, "Wave:%d | %d$ | %d <3", game->wave, game->money, game->lives);
+    if(game->waveActive)
+    {
+        sprintf(buffer, "Wave:%d | %d$ | %d <3", game->wave, game->money, game->lives);
+    }
+    else
+    {
+        sprintf(buffer, "Next:%d | %d$ | %d <3", game->wave + 1, game->money, game->lives);
+    }
     stringRGBA(screen, 0, 230, buffer, 255, 255, 255, 255);
 }
 
