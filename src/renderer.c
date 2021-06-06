@@ -18,7 +18,7 @@ RenderTile renderTiles[NUM_MAP_TILES] = {
 
 #define HUD_X_LENGTH 3
 
-HUDElement hudElements[3] = {
+HUDElement hudElements[NUM_TOWER_TYPES] = {
     {.tower = &towerTypes[0], .position = {.x = 0, .y = 12 * 16}, .name = "Zap"},
     {.tower = &towerTypes[1], .position = {.x = 48, .y = 12 * 16}, .name = "Ice"},
     {.tower = &towerTypes[2], .position = {.x = 96, .y = 12 * 16}, .name = "Fire"}

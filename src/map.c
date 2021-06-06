@@ -31,3 +31,13 @@ uint8_t tileIsEnd(Map* map, uint8_t x, uint8_t y)
     }
     return 0;
 }
+
+uint8_t tileIsReserved(Map* map, uint8_t x, uint8_t y)
+{
+    Tile t = getTileAtPos(map, x, y);
+    if(t == U || t == D || t == L || t == R || t == S || t == E || t == W)
+    {
+        return 1;
+    }
+    return 0;
+}

@@ -15,10 +15,17 @@ EnemyType enemyTypes[NUM_ENEMY_TYPES] = {
     {.health = 3, .speed = 2, .tilePath = "res/enemies/Enemy_2.png", .contains = &enemyTypes[1]}
 };
 
-int placeTower(Point* cursor, Tower towers[], TowerType* new)
+int placeTower(Point* cursor, Tower towers[], TowerType* new, Map* map)
 {
     uint8_t i;
     uint8_t free = 255;
+
+    if(tileIsReserved(map, cursor->x, cursor->y))
+    {
+        //Can't place here
+        return 0;
+    }
+    
     for(i = 0; i < 225; i++)
     {
         if(towers[i].type)

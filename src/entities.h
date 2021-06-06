@@ -52,7 +52,7 @@ extern TowerType towerTypes[NUM_TOWER_TYPES];
 #define NUM_ENEMY_TYPES 3
 extern EnemyType enemyTypes[NUM_ENEMY_TYPES];
 
-int placeTower(Point* cursor, Tower towers[], TowerType* new);
+int placeTower(Point* cursor, Tower towers[], TowerType* new, Map* map);
 
 int addEnemy(Enemy enemies[], uint8_t x, uint8_t y, uint8_t dir, EnemyType* new);
 

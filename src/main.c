@@ -97,7 +97,7 @@ void handleInput()
             {
                 if(cursorMode == CURSOR_MAP && selectedTower)
                 {
-                    if(game.money >= selectedTower->cost && placeTower(&cursor, towers, selectedTower))
+                    if(game.money >= selectedTower->cost && placeTower(&cursor, towers, selectedTower, game.map))
                     {
                         game.money -= selectedTower->cost;
                         //TODO: Play "placed" sound

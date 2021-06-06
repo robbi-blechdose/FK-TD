@@ -21,5 +21,6 @@ extern Map maps[1];
 
 Tile getTileAtPos(Map* map, uint8_t x, uint8_t y);
 uint8_t tileIsEnd(Map* map, uint8_t x, uint8_t y);
+uint8_t tileIsReserved(Map* map, uint8_t x, uint8_t y);
 
 #endif
