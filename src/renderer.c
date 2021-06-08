@@ -2,6 +2,8 @@
 
 //TODO: Draw projectiles
 
+SDL_Surface* menuBackground;
+
 SDL_Surface* cursorTile;
 
 uint8_t animCounter;
@@ -49,6 +51,15 @@ void initRenderer(SDL_Surface* screen)
     }
     //Load font
     gfxPrimitivesSetFont(gfxPrimitivesFontdata, 8, 8);
+
+    //Load menu Background
+    menuBackground = loadPNG("res/title_screen.png");
+}
+
+void drawMenu(SDL_Surface* screen)
+{
+    SDL_Rect pos = {.x = 0, .y = 0};
+    SDL_BlitSurface(menuBackground, NULL, screen, &pos);
 }
 
 void drawMap(SDL_Surface* screen, Map* map)

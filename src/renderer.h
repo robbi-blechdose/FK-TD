@@ -25,6 +25,9 @@ typedef struct {
 #define CURSOR_HUD 1
 
 void initRenderer(SDL_Surface* screen);
+
+void drawMenu(SDL_Surface* screen);
+
 void drawMap(SDL_Surface* screen, Map* map);
 void drawTowers(SDL_Surface* screen, Tower towers[]);
 void drawEnemies(SDL_Surface* screen, Enemy enemies[]);

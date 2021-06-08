@@ -14,6 +14,10 @@ SDL_Event event;
 SDL_Surface* screen;
 FPSmanager fpsManager;
 
+#define STATE_MENU 0
+#define STATE_GAME 1
+uint8_t state;
+
 //Main game fields
 //TODO: Reduce this number?
 #define MAX_TOWERS 225 //225 is the total number of 16x16 tiles that can be on screen at any time
@@ -27,6 +31,15 @@ uint8_t cursorMode;
 Point cursorBackup;
 Point cursor;
 TowerType* selectedTower;
+
+void startGame()
+{
+    game.wave = 0;
+    game.waveActive = 0;
+    game.money = 100;
+    game.lives = 50;
+    game.map = &maps[0];
+}
 
 void startWave()
 {
@@ -167,12 +180,7 @@ int main(int argc, char **argv)
     SDL_setFramerate(&fpsManager, 50);
     srand(time(NULL));
 
-    //Init game
-    game.wave = 0;
-    game.waveActive = 0;
-    game.money = 100;
-    game.lives = 50;
-    game.map = &maps[0];
+    state = STATE_MENU;
     initRenderer(screen);
     initEffects();
 
@@ -186,25 +194,48 @@ int main(int argc, char **argv)
             {
                 running = 0;
             }
-            handleInput();
+
+            if(state == STATE_MENU)
+            {
+                if(event.type == SDL_KEYUP)
+                {
+                    if(event.key.keysym.sym == SDLK_s)
+                    {
+                        state = STATE_GAME;
+                        startGame();
+                    }
+                }
+            }
+            else //if(state == STATE_GAME)
+            {
+                handleInput();
+            }
         }
 
-        if(game.waveActive)
+        if(state == STATE_MENU)
         {
-            //Update
-            updateTowers(towers, enemies, &game.money);
-            uint8_t hasEnemies = updateEnemies(enemies, &maps[0], &game);
-            uint8_t hasWave = updateWaveGenerator(enemies, game.wave);
-            game.waveActive = hasEnemies || hasWave;
+            drawMenu(screen);
+        }
+        else //if(state == STATE_GAME)
+        {
+            if(game.waveActive)
+            {
+                //Update
+                updateTowers(towers, enemies, &game.money);
+                uint8_t hasEnemies = updateEnemies(enemies, &maps[0], &game);
+                uint8_t hasWave = updateWaveGenerator(enemies, game.wave);
+                game.waveActive = hasEnemies || hasWave;
+            }
+
+            //Draw
+            drawMap(screen, game.map);
+            drawTowers(screen, towers);
+            drawEnemies(screen, enemies);
+            drawHUD(screen, &game);
+            drawCursor(screen, &cursor, cursorMode, selectedTower);
+            drawEffects(screen);
         }
 
-        //Draw
-        drawMap(screen, game.map);
-        drawTowers(screen, towers);
-        drawEnemies(screen, enemies);
-        drawHUD(screen, &game);
-        drawCursor(screen, &cursor, cursorMode, selectedTower);
-        drawEffects(screen);
         SDL_Flip(screen);
         SDL_framerateDelay(&fpsManager);
     }
