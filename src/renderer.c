@@ -58,8 +58,18 @@ void initRenderer(SDL_Surface* screen)
 
 void drawMenu(SDL_Surface* screen)
 {
+    static uint8_t menuTimer;
+    menuTimer += 4; //Uses overflow behavior to roll over
+
     SDL_Rect pos = {.x = 0, .y = 0};
     SDL_BlitSurface(menuBackground, NULL, screen, &pos);
+    if(menuTimer < 128)
+    {
+        stringRGBA(screen, 120 - (11 * 8) / 2, 160, "PRESS START", 255, 255, 255, 255);
+    }
+    stringRGBA(screen, 120 - (8 * 8) / 2, 190, "Made by:", 255, 255, 255, 255);
+    stringRGBA(screen, 120 - (15 * 8) / 2, 198, "Robbi Blechdose", 255, 255, 255, 255);
+    stringRGBA(screen, 120 - (7 * 8) / 2, 206, "V13Loca", 255, 255, 255, 255);
 }
 
 void drawMap(SDL_Surface* screen, Map* map)
