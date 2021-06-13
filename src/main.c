@@ -16,6 +16,7 @@ FPSmanager fpsManager;
 
 #define STATE_MENU 0
 #define STATE_GAME 1
+#define STATE_LOST 2
 uint8_t state;
 
 //Main game fields
@@ -206,9 +207,19 @@ int main(int argc, char **argv)
                     }
                 }
             }
-            else //if(state == STATE_GAME)
+            else if(state == STATE_GAME)
             {
                 handleInput();
+            }
+            else //if(state == STATE_LOST)
+            {
+                if(event.type == SDL_KEYUP)
+                {
+                    if(event.key.keysym.sym == SDLK_s)
+                    {
+                        state = STATE_MENU;
+                    }
+                }
             }
         }
 
@@ -216,7 +227,7 @@ int main(int argc, char **argv)
         {
             drawMenu(screen);
         }
-        else //if(state == STATE_GAME)
+        else if(state == STATE_GAME)
         {
             if(game.waveActive)
             {
@@ -227,6 +238,11 @@ int main(int argc, char **argv)
                 game.waveActive = hasEnemies || hasWave;
             }
 
+            if(!game.lives)
+            {
+                state = STATE_LOST;
+            }
+
             //Draw
             drawMap(screen, game.map);
             drawTowers(screen, towers);
@@ -234,6 +250,10 @@ int main(int argc, char **argv)
             drawHUD(screen, &game);
             drawCursor(screen, &cursor, cursorMode, selectedTower);
             drawEffects(screen);
+        }
+        else //if(state == STATE_LOST)
+        {
+            drawLoseScreen(screen);
         }
 
         SDL_Flip(screen);
