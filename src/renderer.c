@@ -8,15 +8,19 @@ SDL_Surface* loseScreen;
 SDL_Surface* cursorTile;
 
 uint8_t animCounter;
-RenderTile renderTiles[NUM_MAP_TILES] = {
+RenderTile renderTiles[NUM_RENDER_TILES] = {
     {.path = "res/tiles/Grass.png", .frames = 0},
     {.path = "res/tiles/Water.png", .frames = 8},
     {.path = "res/tiles/Start.png", .frames = 0},
     {.path = "res/tiles/FunKey_S.png", .frames = 0},
-    {.path = "res/tiles/Up.png", .frames = 0},
-    {.path = "res/tiles/Down.png", .frames = 0},
-    {.path = "res/tiles/Left.png", .frames = 0},
-    {.path = "res/tiles/Right.png", .frames = 0}
+    {.path = "res/tiles/R_Up.png", .frames = 0},
+    {.path = "res/tiles/R_Down.png", .frames = 0},
+    {.path = "res/tiles/R_Left.png", .frames = 0},
+    {.path = "res/tiles/R_Right.png", .frames = 0},
+    {.path = "res/tiles/R_LD.png", .frames = 0},
+    {.path = "res/tiles/R_LU.png", .frames = 0},
+    {.path = "res/tiles/R_RD.png", .frames = 0},
+    {.path = "res/tiles/R_RU.png", .frames = 0}
 };
 
 #define HUD_X_LENGTH 3
@@ -36,7 +40,7 @@ void initRenderer(SDL_Surface* screen)
     //Load cursor
     cursorTile = loadPNG("res/Cursor.png");
     //Load tiles
-    for(i = 0; i < NUM_MAP_TILES; i++)
+    for(i = 0; i < NUM_RENDER_TILES; i++)
     {
         renderTiles[i].tile = loadPNG(renderTiles[i].path);
     }
@@ -89,7 +93,7 @@ void drawMap(SDL_Surface* screen, Map* map)
         for(j = 0; j < 12; j++)
         {
             SDL_Rect pos = {.x = i * 16, .y = j * 16};
-            Tile index = map->tiles[i + j * 15];
+            uint8_t index = map->displayTiles[i + j * 15];
             if(renderTiles[index].frames)
             {
                 SDL_Rect rect = {.x = (animCounter / 16 % renderTiles[index].frames) * 16, .y = 0, .w = 16, .h = 16};
