@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <SDL/SDL.h>
+#include "utils.h"
 
 #define NUM_RENDER_TILES 12
 #define NUM_LOGIC_TILES 8
@@ -19,10 +20,12 @@ typedef struct {
     LogicTile logicTiles[MAP_WIDTH * MAP_HEIGHT];
 } Map;
 
-extern Map maps[1];
+#define NUM_MAPS 2
+extern Map maps[NUM_MAPS];
 
 LogicTile getTileAtPos(Map* map, uint8_t x, uint8_t y);
 uint8_t tileIsEnd(Map* map, uint8_t x, uint8_t y);
 uint8_t tileIsReserved(Map* map, uint8_t x, uint8_t y);
+Point getStartPos(Map* map);
 
 #endif
