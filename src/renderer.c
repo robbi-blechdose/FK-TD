@@ -59,7 +59,7 @@ void initRenderer(SDL_Surface* screen)
 
     //Load screens
     titleScreen = loadPNG("res/screens/title_screen.png");
-    loseScreen = loadPNG("res/screens/lose_screen.png");
+    loseScreen = loadPNG("res/screens/game_over.png");
 }
 
 void drawMenu(SDL_Surface* screen)

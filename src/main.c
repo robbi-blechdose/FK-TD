@@ -25,7 +25,7 @@ uint8_t state;
 #define MAX_ENEMIES 225
 Tower towers[MAX_TOWERS];
 Enemy enemies[MAX_ENEMIES];
-
+Map* map;
 Game game;
 
 uint8_t cursorMode;
@@ -38,15 +38,15 @@ void startGame()
     game.wave = 0;
     game.waveActive = 0;
     game.money = 100;
-    game.lives = 50;
-    game.map = &maps[0];
+    game.lives = 25;
+    map = &maps[1];
 }
 
 void startWave()
 {
     game.wave++;
     game.waveActive = 1;
-    initWaveGenerator(game.wave);
+    initWaveGenerator(game.wave, getStartPos(map));
 }
 
 void handleInput()
@@ -111,7 +111,7 @@ void handleInput()
             {
                 if(cursorMode == CURSOR_MAP && selectedTower)
                 {
-                    if(game.money >= selectedTower->cost && placeTower(&cursor, towers, selectedTower, game.map))
+                    if(game.money >= selectedTower->cost && placeTower(&cursor, towers, selectedTower, map))
                     {
                         game.money -= selectedTower->cost;
                         //TODO: Play "placed" sound
@@ -233,7 +233,7 @@ int main(int argc, char **argv)
             {
                 //Update
                 updateTowers(towers, enemies, &game.money);
-                uint8_t hasEnemies = updateEnemies(enemies, &maps[0], &game);
+                uint8_t hasEnemies = updateEnemies(enemies, map, &game);
                 uint8_t hasWave = updateWaveGenerator(enemies, game.wave);
                 game.waveActive = hasEnemies || hasWave;
             }
@@ -244,7 +244,7 @@ int main(int argc, char **argv)
             }
 
             //Draw
-            drawMap(screen, game.map);
+            drawMap(screen, map);
             drawTowers(screen, towers);
             drawEnemies(screen, enemies);
             drawHUD(screen, &game);
