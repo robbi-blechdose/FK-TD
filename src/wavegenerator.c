@@ -4,17 +4,21 @@
 uint16_t timer;
 uint16_t rcount;
 uint16_t rushActive;
+Point startPoint;
 
-void initWaveGenerator(uint8_t wave)
+void initWaveGenerator(uint8_t wave, Point sp)
 {
     rcount = 12 * wave;
     rushActive = 0;
+    startPoint.x = sp.x * 16;
+    startPoint.y = sp.y * 16;
 }
 
 void spawnEnemy(Enemy enemies[], uint8_t wave)
 {
+    //TODO: Cap to max enemy index
     uint8_t enemyIndex = (rand() % (wave * 100)) / 100;
-    addEnemy(enemies, 16, 16, 1, &enemyTypes[enemyIndex]);
+    addEnemy(enemies, startPoint.x, startPoint.y, 1, &enemyTypes[enemyIndex]);
     rcount--;
 }
 

@@ -180,6 +180,11 @@ uint8_t updateEnemies(Enemy enemies[], Map* map, Game* game)
                 else
                 {
                     enemies[i].direction = getTileAtPos(map, x, y) - 4;
+                    //Start tile means move down!
+                    if(getTileAtPos(map, x, y) == S)
+                    {
+                        enemies[i].direction = 1;
+                    }
                     enemies[i].toMove = 16;
                 }
             }
