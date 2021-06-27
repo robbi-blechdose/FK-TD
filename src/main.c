@@ -207,6 +207,13 @@ int main(int argc, char **argv)
             {
                 running = 0;
             }
+            else if(event.type == SDL_KEYUP)
+            {
+                if(event.key.keysym.sym == SDLK_q)
+                {
+                    running = 0;
+                }
+            }
 
             if(state == STATE_MENU)
             {
