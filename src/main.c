@@ -17,7 +17,10 @@ FPSmanager fpsManager;
 #define STATE_MENU 0
 #define STATE_GAME 1
 #define STATE_LOST 2
+#define STATE_MAPSELECT 3
 uint8_t state;
+
+uint8_t mapSelectIndex;
 
 //Main game fields
 //TODO: Reduce this number?
@@ -40,6 +43,14 @@ void startGame()
     game.money = 100;
     game.lives = 25;
     map = &maps[1];
+    for(uint8_t i = 0; i < MAX_TOWERS; i++)
+    {
+        towers[i].type = NULL;
+    }
+    for(uint8_t i = 0; i < MAX_ENEMIES; i++)
+    {
+        enemies[i].type = NULL;
+    }
 }
 
 void startWave()
@@ -182,6 +193,7 @@ int main(int argc, char **argv)
     srand(time(NULL));
 
     state = STATE_MENU;
+    mapSelectIndex = 0;
     initRenderer(screen);
     initEffects();
 
@@ -202,8 +214,7 @@ int main(int argc, char **argv)
                 {
                     if(event.key.keysym.sym == SDLK_s)
                     {
-                        state = STATE_GAME;
-                        startGame();
+                        state = STATE_MAPSELECT;
                     }
                 }
             }
@@ -211,13 +222,39 @@ int main(int argc, char **argv)
             {
                 handleInput();
             }
-            else //if(state == STATE_LOST)
+            else if(state == STATE_LOST)
             {
                 if(event.type == SDL_KEYUP)
                 {
                     if(event.key.keysym.sym == SDLK_s)
                     {
                         state = STATE_MENU;
+                    }
+                }
+            }
+            else //if(state == STATE_MAPSELECT)
+            {
+                if(event.type == SDL_KEYUP)
+                {
+                    if(event.key.keysym.sym == SDLK_s)
+                    {
+                        state = STATE_GAME;
+                        map = &maps[mapSelectIndex];
+                        startGame();
+                    }
+                    else if(event.key.keysym.sym == SDLK_l)
+                    {
+                        if(mapSelectIndex > 0)
+                        {
+                            mapSelectIndex--;
+                        }
+                    }
+                    else if(event.key.keysym.sym == SDLK_r)
+                    {
+                        if(mapSelectIndex < NUM_MAPS - 1)
+                        {
+                            mapSelectIndex++;
+                        }
                     }
                 }
             }
@@ -251,9 +288,13 @@ int main(int argc, char **argv)
             drawCursor(screen, &cursor, cursorMode, selectedTower);
             drawEffects(screen);
         }
-        else //if(state == STATE_LOST)
+        else if(state == STATE_LOST)
         {
             drawLoseScreen(screen);
+        }
+        else //if(state == STATE_MAPSELECT)
+        {
+            drawMap(screen, &maps[mapSelectIndex]);
         }
 
         SDL_Flip(screen);
