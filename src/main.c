@@ -295,6 +295,7 @@ int main(int argc, char **argv)
         else //if(state == STATE_MAPSELECT)
         {
             drawMap(screen, &maps[mapSelectIndex]);
+            drawMapSelect(screen);
         }
 
         SDL_Flip(screen);

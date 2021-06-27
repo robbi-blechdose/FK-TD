@@ -28,6 +28,7 @@ void initRenderer(SDL_Surface* screen);
 
 void drawMenu(SDL_Surface* screen);
 void drawLoseScreen(SDL_Surface* screen);
+void drawMapSelect(SDL_Surface* screen);
 
 void drawMap(SDL_Surface* screen, Map* map);
 void drawTowers(SDL_Surface* screen, Tower towers[]);

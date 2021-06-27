@@ -84,6 +84,18 @@ void drawLoseScreen(SDL_Surface* screen)
     SDL_BlitSurface(loseScreen, NULL, screen, &pos);
 }
 
+void drawMapSelect(SDL_Surface* screen)
+{
+    static uint8_t menuTimer;
+    menuTimer += 4; //Uses overflow behavior to roll over
+    
+    boxRGBA(screen, 0, 12 * 16, 240, 240, 160, 82, 40, 255);
+    if(menuTimer < 128)
+    {
+        stringRGBA(screen, 120 - (18 * 8) / 2, 212, "<   SELECT MAP   >", 255, 255, 255, 255);
+    }
+}
+
 void drawMap(SDL_Surface* screen, Map* map)
 {
     uint8_t i, j;
