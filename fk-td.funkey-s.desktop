@@ -5,4 +5,4 @@ Comment=Tower Defense Game
 Exec=main-funkey.elf
 Icon=icon
 Terminal=false
-Categories=applications;
+Categories=games;
