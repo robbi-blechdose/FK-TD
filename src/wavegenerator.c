@@ -17,9 +17,9 @@ void initWaveGenerator(uint8_t wave, Point sp)
 void spawnEnemy(Enemy enemies[], uint8_t wave)
 {
     uint8_t enemyIndex = (rand() % (wave * 100)) / 100;
-    if(enemyIndex > 2)
+    if(enemyIndex > 5)
     {
-        enemyIndex = 2;
+        enemyIndex = 5;
     }
     addEnemy(enemies, startPoint.x, startPoint.y, 1, &enemyTypes[enemyIndex]);
     rcount--;
