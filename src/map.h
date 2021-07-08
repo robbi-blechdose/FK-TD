@@ -5,7 +5,7 @@
 #include <SDL/SDL.h>
 #include "utils.h"
 
-#define NUM_RENDER_TILES 12
+#define NUM_RENDER_TILES 13
 #define NUM_LOGIC_TILES 8
 typedef enum {
     G, W, S, E,

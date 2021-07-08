@@ -20,7 +20,8 @@ RenderTile renderTiles[NUM_RENDER_TILES] = {
     {.path = "res/tiles/R_LD.png", .frames = 0},
     {.path = "res/tiles/R_LU.png", .frames = 0},
     {.path = "res/tiles/R_RD.png", .frames = 0},
-    {.path = "res/tiles/R_RU.png", .frames = 0}
+    {.path = "res/tiles/R_RU.png", .frames = 0},
+    {.path = "res/tiles/Sand.png", .frames = 0}
 };
 
 #define HUD_X_LENGTH 3
@@ -76,6 +77,7 @@ void drawMenu(SDL_Surface* screen)
     stringRGBA(screen, 120 - (8 * 8) / 2, 200, "Made by:", 255, 255, 255, 255);
     stringRGBA(screen, 120 - (15 * 8) / 2, 208, "Robbi Blechdose", 255, 255, 0, 255);
     stringRGBA(screen, 120 - (7 * 8) / 2, 216, "V13Loca", 255, 0, 255, 255);
+    stringRGBA(screen, 120 - (9 * 8) / 2, 224, "bickman14", 192, 0, 255, 255);
 }
 
 void drawLoseScreen(SDL_Surface* screen)
@@ -149,8 +151,9 @@ void drawEnemies(SDL_Surface* screen, Enemy enemies[])
     {
         if(enemies[i].type)
         {
-            SDL_Rect pos = {.x = enemies[i].position.x, .y = enemies[i].position.y};
-            SDL_BlitSurface(enemies[i].type->tile, NULL, screen, &pos);
+            SDL_Rect rect = {.x = (animCounter / 8 % 2) * 14, .y = 0, .w = 14, .h = 14};
+            SDL_Rect pos = {.x = enemies[i].position.x + 1, .y = enemies[i].position.y + 1};
+            SDL_BlitSurface(enemies[i].type->tile, &rect, screen, &pos);
         }
     }
 }
