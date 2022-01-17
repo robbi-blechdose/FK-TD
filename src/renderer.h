@@ -10,7 +10,7 @@
 #include "map.h"
 
 typedef struct {
-    TowerType *tower;
+    uint8_t tower;
     SDL_Rect position;
     char* name;
 } HUDElement;
@@ -34,7 +34,6 @@ void drawMap(SDL_Surface* screen, Map* map);
 void drawTowers(SDL_Surface* screen, Tower towers[]);
 void drawEnemies(SDL_Surface* screen, Enemy enemies[]);
 void drawHUD(SDL_Surface* screen, Game* game);
-void drawCursor(SDL_Surface* screen, Point* cursors, uint8_t cursorMode, TowerType* selectedTower);
-TowerType* getSelectedTower(Point* cursor);
+void drawCursor(SDL_Surface* screen, Point* cursors, uint8_t cursorMode, uint8_t selectedTower);
 
 #endif

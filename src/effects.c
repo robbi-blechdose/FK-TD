@@ -2,19 +2,18 @@
 
 Effect effects[255];
 
-SDL_Surface* fireball;
+SDL_Surface* explosion;
 
 void initEffects()
 {
-    fireball = loadPNG("res/effects/fireball.png");
+    explosion = loadPNG("res/effects/explosion.png");
 }
 
 void addEffect(EffectType t, Point* tower, Point* enemy, uint8_t radius)
 {
-    uint8_t i;
-    for(i = 0; i < 255; i++)
+    for(uint8_t i = 0; i < 255; i++)
     {
-        if(effects[i].type == NONE)
+        if(effects[i].type == E_NONE)
         {
             effects[i].type = t;
             effects[i].timer = 5;
@@ -32,12 +31,11 @@ void addEffect(EffectType t, Point* tower, Point* enemy, uint8_t radius)
 
 void drawEffects(SDL_Surface* screen)
 {
-    uint8_t i;
-    for(i = 0; i < 255; i++)
+    for(uint8_t i = 0; i < 255; i++)
     {
         switch(effects[i].type)
         {
-            case ZAP:
+            case E_ZAP:
             {
                 uint8_t mx = effects[i].middle.x + (rand() % 16 - 8);
                 uint8_t my = effects[i].middle.y + (rand() % 16 - 8);
@@ -45,7 +43,7 @@ void drawEffects(SDL_Surface* screen)
                 thickLineRGBA(screen, mx, my, effects[i].b.x, effects[i].b.y, 2, 0, 170, 255, 255);
                 break;
             }
-            case ICE:
+            case E_ICE:
             {
                 circleRGBA(screen, effects[i].a.x, effects[i].a.y, effects[i].radius + (rand() % 8 - 4),
                             0, 255, 255, 255);
@@ -53,13 +51,11 @@ void drawEffects(SDL_Surface* screen)
                             0, 200, 255, 255);
                 break;
             }
-            case FIRE:
+            case E_EXPLOSION:
             {
-                SDL_Rect rect = {.x = 8 * (effects[i].timer % 2), .y = 0, .w = 8, .h = 8};
-                float diff = effects[i].timer / 5.0f;
-                SDL_Rect pos = {.x = lerp(effects[i].b.x, effects[i].a.x, diff) - 4,
-                                .y = lerp(effects[i].b.y, effects[i].a.y, diff) - 4};
-                SDL_BlitSurface(fireball, &rect, screen, &pos);
+                SDL_Rect rect = {.x = 32 * (effects[i].timer % 8), .y = 0, .w = 32, .h = 32};
+                SDL_Rect pos = {.x = effects[i].a.x - 16, .y = effects[i].a.y - 16};
+                SDL_BlitSurface(explosion, &rect, screen, &pos);
                 break;
             }
             default:
@@ -73,7 +69,7 @@ void drawEffects(SDL_Surface* screen)
             effects[i].timer--;
             if(!effects[i].timer)
             {
-                effects[i].type = NONE;
+                effects[i].type = E_NONE;
             }
         }
     }

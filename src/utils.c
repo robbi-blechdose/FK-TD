@@ -7,6 +7,11 @@ void copyPoint(Point* dst, Point* src)
     dst->y = src->y;
 }
 
+uint8_t hitPE(Point* enemy, Point* projectile)
+{
+    return sqrt(pow(enemy->x + 8 - projectile->x, 2) + pow(enemy->y + 8 - projectile->y, 2)) < 8;
+}
+
 uint8_t distanceTE(Point* enemy, Point* tower)
 {
     Point temp;

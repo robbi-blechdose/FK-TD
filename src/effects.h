@@ -7,10 +7,10 @@
 #include "utils.h"
 
 typedef enum {
-    NONE,
-    ZAP,
-    ICE,
-    FIRE
+    E_NONE,
+    E_ZAP,
+    E_ICE,
+    E_EXPLOSION
 } EffectType;
 
 typedef struct {

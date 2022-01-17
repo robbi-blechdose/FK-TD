@@ -2,6 +2,8 @@
 #include <SDL.h>
 #include <SDL_framerate.h>
 
+#include "engine/input.h"
+
 #include "renderer.h"
 #include "entities.h"
 #include "utils.h"
@@ -26,15 +28,17 @@ uint8_t mapSelectIndex;
 //TODO: Reduce this number?
 #define MAX_TOWERS 225 //225 is the total number of 16x16 tiles that can be on screen at any time
 #define MAX_ENEMIES 225
+#define MAX_PROJECTILES 255
 Tower towers[MAX_TOWERS];
 Enemy enemies[MAX_ENEMIES];
+Projectile projectiles[MAX_PROJECTILES];
 Map* map;
 Game game;
 
 uint8_t cursorMode;
 Point cursorBackup;
 Point cursor;
-TowerType* selectedTower;
+uint8_t selectedTower;
 
 void startGame()
 {
@@ -42,15 +46,26 @@ void startGame()
     game.waveActive = 0;
     game.money = 100;
     game.lives = 25;
-    map = &maps[1];
+    //Clear tower, enemy and projectile lists
     for(uint8_t i = 0; i < MAX_TOWERS; i++)
     {
-        towers[i].type = NULL;
+        towers[i].type = TOWER_TYPE_NONE;
     }
     for(uint8_t i = 0; i < MAX_ENEMIES; i++)
     {
-        enemies[i].type = NULL;
+        enemies[i].type = ENEMY_TYPE_NONE;
     }
+    for(uint8_t i = 0; i < MAX_PROJECTILES; i++)
+    {
+        projectiles[i].type = PROJECTILE_TYPE_NONE;
+    }
+    //Initialize cursors
+    cursorMode = CURSOR_MAP;
+    cursor.x = 0;
+    cursor.y = 0;
+    cursorBackup.x = 0;
+    cursorBackup.y = 0;
+    selectedTower = TOWER_TYPE_NONE;
 }
 
 void startWave()
@@ -60,21 +75,28 @@ void startWave()
     initWaveGenerator(game.wave, getStartPos(map));
 }
 
-void handleInput()
+void calcFrame()
 {
-    if(event.type == SDL_KEYUP)
+    switch(state)
     {
-        switch(event.key.keysym.sym)
+        case STATE_MENU:
         {
-            case SDLK_u:
+            if(keyUp(B_START))
+            {
+                state = STATE_MAPSELECT;
+            }
+            break;
+        }
+        case STATE_GAME:
+        {
+            if(keyUp(B_UP))
             {
                 if(cursor.y > 0)
                 {
                     cursor.y--;
                 }
-                break;
             }
-            case SDLK_d:
+            else if(keyUp(B_DOWN))
             {
                 if(cursorMode == CURSOR_MAP)
                 {
@@ -83,24 +105,16 @@ void handleInput()
                         cursor.y++;
                     }
                 }
-                else
-                {
-                    if(cursor.y < 0)
-                    {
-                        cursor.y++;
-                    }
-                }
-                break;
             }
-            case SDLK_l:
+            
+            if(keyUp(B_LEFT))
             {
                 if(cursor.x > 0)
                 {
                     cursor.x--;
                 }
-                break;
             }
-            case SDLK_r:
+            else if(keyUp(B_RIGHT))
             {
                 if(cursorMode == CURSOR_MAP)
                 {
@@ -111,20 +125,20 @@ void handleInput()
                 }
                 else
                 {
-                    if(cursor.x < 2)
+                    if(cursor.x < NUM_TOWER_TYPES - 1)
                     {
                         cursor.x++;
                     }
                 }
-                break;
             }
-            case SDLK_a:
+
+            if(keyUp(A))
             {
-                if(cursorMode == CURSOR_MAP && selectedTower)
+                if(cursorMode == CURSOR_MAP && selectedTower != TOWER_TYPE_NONE)
                 {
-                    if(game.money >= selectedTower->cost && placeTower(&cursor, towers, selectedTower, map))
+                    if(game.money >= towerTypes[selectedTower].cost && placeTower(&cursor, towers, selectedTower, map))
                     {
-                        game.money -= selectedTower->cost;
+                        game.money -= towerTypes[selectedTower].cost;
                         //TODO: Play "placed" sound
                     }
                     else
@@ -134,20 +148,18 @@ void handleInput()
                 }
                 else
                 {
-                    selectedTower = getSelectedTower(&cursor);
+                    selectedTower = cursor.x + cursor.y; //TODO: Multiply y with max x
                     //TODO: Play "selected" sound
                 }
-                break;
             }
-            case SDLK_b:
+            else if(keyUp(B))
             {
                 if(selectedTower)
                 {
-                    selectedTower = NULL;
+                    selectedTower = TOWER_TYPE_NONE;
                 }
-                break;
             }
-            case SDLK_k:
+            else if(keyUp(K))
             {
                 //Swap cursors
                 Point temp;
@@ -163,22 +175,103 @@ void handleInput()
                 {
                     cursorMode = CURSOR_MAP;
                 }
-                break;
             }
-            case SDLK_s:
+            else if(keyUp(B_START))
             {
                 if(!game.waveActive)
                 {
                     startWave();
                 }
-                break;
             }
-            default:
+
+            if(game.waveActive)
             {
+                //Update
+                updateTowers(towers, enemies, projectiles, &game.money);
+                uint8_t hasEnemies = updateEnemies(enemies, map, &game);
+                uint8_t hasWave = updateWaveGenerator(enemies, game.wave);
+                uint8_t hasProjectiles = updateProjectiles(projectiles, enemies, &game.money);
+                game.waveActive = hasEnemies || hasWave || hasProjectiles;
+            }
+
+            if(!game.lives)
+            {
+                state = STATE_LOST;
+            }
+
+            break;
+        }
+        case STATE_LOST:
+        {
+            if(keyUp(B_START))
+            {
+                state = STATE_MENU;
+            }
+            break;
+        }
+        case STATE_MAPSELECT:
+        {
+            if(keyUp(B_START))
+            {
+                state = STATE_GAME;
+                map = &maps[mapSelectIndex];
+                startGame();
+            }
+            else if(keyUp(B_LEFT))
+            {
+                if(mapSelectIndex > 0)
+                {
+                    mapSelectIndex--;
+                }
                 break;
             }
+            else if(keyUp(B_RIGHT))
+            {
+                if(mapSelectIndex < NUM_MAPS - 1)
+                {
+                    mapSelectIndex++;
+                }
+            }
+            break;
         }
     }
+}
+
+void drawFrame()
+{
+    switch(state)
+    {
+        case STATE_MENU:
+        {
+            drawMenu(screen);
+            break;
+        }
+        case STATE_GAME:
+        {
+            //Draw
+            drawMap(screen, map);
+            drawTowers(screen, towers);
+            drawEnemies(screen, enemies);
+            drawProjectiles(screen, projectiles);
+            drawHUD(screen, &game);
+            drawCursor(screen, &cursor, cursorMode, selectedTower);
+            drawEffects(screen);
+            break;
+        }
+        case STATE_LOST:
+        {
+            drawLoseScreen(screen);
+            break;
+        }
+        case STATE_MAPSELECT:
+        {
+            drawMap(screen, &maps[mapSelectIndex]);
+            drawMapSelect(screen);
+            break;
+        }
+    }
+
+    SDL_Flip(screen);
 }
 
 int main(int argc, char **argv)
@@ -200,112 +293,11 @@ int main(int argc, char **argv)
     //Main loop
     while(running)
     {
-        //Read input
-        while(SDL_PollEvent(&event))
-        {
-            if(event.type == SDL_QUIT)
-            {
-                running = 0;
-            }
-            else if(event.type == SDL_KEYUP)
-            {
-                if(event.key.keysym.sym == SDLK_q)
-                {
-                    running = 0;
-                }
-            }
+        running = handleInput();
+        
+        calcFrame();
+        drawFrame();
 
-            if(state == STATE_MENU)
-            {
-                if(event.type == SDL_KEYUP)
-                {
-                    if(event.key.keysym.sym == SDLK_s)
-                    {
-                        state = STATE_MAPSELECT;
-                    }
-                }
-            }
-            else if(state == STATE_GAME)
-            {
-                handleInput();
-            }
-            else if(state == STATE_LOST)
-            {
-                if(event.type == SDL_KEYUP)
-                {
-                    if(event.key.keysym.sym == SDLK_s)
-                    {
-                        state = STATE_MENU;
-                    }
-                }
-            }
-            else //if(state == STATE_MAPSELECT)
-            {
-                if(event.type == SDL_KEYUP)
-                {
-                    if(event.key.keysym.sym == SDLK_s)
-                    {
-                        state = STATE_GAME;
-                        map = &maps[mapSelectIndex];
-                        startGame();
-                    }
-                    else if(event.key.keysym.sym == SDLK_l)
-                    {
-                        if(mapSelectIndex > 0)
-                        {
-                            mapSelectIndex--;
-                        }
-                    }
-                    else if(event.key.keysym.sym == SDLK_r)
-                    {
-                        if(mapSelectIndex < NUM_MAPS - 1)
-                        {
-                            mapSelectIndex++;
-                        }
-                    }
-                }
-            }
-        }
-
-        if(state == STATE_MENU)
-        {
-            drawMenu(screen);
-        }
-        else if(state == STATE_GAME)
-        {
-            if(game.waveActive)
-            {
-                //Update
-                updateTowers(towers, enemies, &game.money);
-                uint8_t hasEnemies = updateEnemies(enemies, map, &game);
-                uint8_t hasWave = updateWaveGenerator(enemies, game.wave);
-                game.waveActive = hasEnemies || hasWave;
-            }
-
-            if(!game.lives)
-            {
-                state = STATE_LOST;
-            }
-
-            //Draw
-            drawMap(screen, map);
-            drawTowers(screen, towers);
-            drawEnemies(screen, enemies);
-            drawHUD(screen, &game);
-            drawCursor(screen, &cursor, cursorMode, selectedTower);
-            drawEffects(screen);
-        }
-        else if(state == STATE_LOST)
-        {
-            drawLoseScreen(screen);
-        }
-        else //if(state == STATE_MAPSELECT)
-        {
-            drawMap(screen, &maps[mapSelectIndex]);
-            drawMapSelect(screen);
-        }
-
-        SDL_Flip(screen);
         SDL_framerateDelay(&fpsManager);
     }
 

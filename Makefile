@@ -14,7 +14,7 @@ include $(TARGET).mk
 endif
 
 # Files to be compiled
-SRCDIR 		=  ./src
+SRCDIR 		=  ./src ./src/engine
 VPATH		= $(SRCDIR)
 SRC_C		= $(foreach dir, $(SRCDIR), $(wildcard $(dir)/*.c))
 OBJS		= $(notdir $(patsubst %.c, %.o, $(SRC_C)))
@@ -25,9 +25,6 @@ $(PNAME): $(OBJS)
 
 $(OBJS): %.o : %.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c -o $@ $<
-
-clean:
-	rm -r build/*
 
 oclean:
 	rm *.o

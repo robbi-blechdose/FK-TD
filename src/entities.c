@@ -1,23 +1,28 @@
 #include "entities.h"
 
 TowerType towerTypes[NUM_TOWER_TYPES] = {
-    {.attack = ZAP, .cost = 50, .cooldown = 50, .damage = 1, .radius = 2,
-        .tilePath = "res/towers/zap_tower.png", .frames = 2},
-    {.attack = ICE, .cost = 75, .cooldown = 75, .damage = 1, .radius = 2,
-        .tilePath = "res/towers/ice_tower.png", .frames = 2},
-    {.attack = FIRE, .cost = 100, .cooldown = 10, .damage = 1, .radius = 3,
-        .tilePath = "res/towers/fire_tower.png", .frames = 2}
+    {.attack = A_ZAP, .cost = 50, .cooldown = 50, .damage = 1, .radius = 2, .tilePath = "res/towers/zap_tower.png", .frames = 2},
+    {.attack = A_ICE, .cost = 75, .cooldown = 75, .damage = 0, .radius = 2, .tilePath = "res/towers/ice_tower.png", .frames = 2},
+    {.attack = A_FIRE, .cost = 100, .cooldown = 20, .damage = 1, .radius = 3, .tilePath = "res/towers/fire_tower.png", .frames = 2},
+    {.attack = A_CANNON, .cost = 100, .cooldown = 60, .damage = 8, .radius = 4, .tilePath = "res/towers/cannon_tower.png", .frames = 2}
 };
 
 EnemyType enemyTypes[NUM_ENEMY_TYPES] = {
-    {.health = 1, .speed = 1, .tilePath = "res/enemies/Enemy_0.png", .contains = NULL},
-    {.health = 2, .speed = 1, .tilePath = "res/enemies/Enemy_1.png", .contains = &enemyTypes[0]},
-    {.health = 3, .speed = 2, .tilePath = "res/enemies/Enemy_2.png", .contains = &enemyTypes[1]}
+    {.health = 1, .speed = 0.8f, .tilePath = "res/enemies/Enemy_0.png", .contains = ENEMY_TYPE_NONE},
+    {.health = 2, .speed = 1.0f, .tilePath = "res/enemies/Enemy_1.png", .contains = 0},
+    {.health = 3, .speed = 1.2f, .tilePath = "res/enemies/Enemy_2.png", .contains = 1},
+    {.health = 4, .speed = 1.5f, .tilePath = "res/enemies/Enemy_3.png", .contains = 2},
+    {.health = 5, .speed = 2.0f, .tilePath = "res/enemies/Enemy_4.png", .contains = 3},
+    {.health = 6, .speed = 2.5f, .tilePath = "res/enemies/Enemy_5.png", .contains = 4}
 };
 
-int placeTower(Point* cursor, Tower towers[], TowerType* new, Map* map)
+ProjectileType projectileTypes[NUM_PROJECTILE_TYPES] = {
+    {.life =  5, .damage = 1, .tilePath = "res/projectiles/fireball.png"},
+    {.life = 10, .damage = 2, .tilePath = "res/projectiles/cannonball.png"}
+};
+
+uint8_t placeTower(Point* cursor, Tower towers[], uint8_t type, Map* map)
 {
-    uint8_t i;
     uint8_t free = 255;
 
     if(tileIsReserved(map, cursor->x, cursor->y))
@@ -26,9 +31,9 @@ int placeTower(Point* cursor, Tower towers[], TowerType* new, Map* map)
         return 0;
     }
     
-    for(i = 0; i < 225; i++)
+    for(uint8_t i = 0; i < 225; i++)
     {
-        if(towers[i].type)
+        if(towers[i].type != TOWER_TYPE_NONE)
         {
             if(towers[i].position.x == cursor->x &&
                 towers[i].position.y == cursor->y)
@@ -46,7 +51,7 @@ int placeTower(Point* cursor, Tower towers[], TowerType* new, Map* map)
     if(free != 255)
     {
         //We found a spot, place the tower
-        towers[free].type = new;
+        towers[free].type = type;
         towers[free].position.x = cursor->x;
         towers[free].position.y = cursor->y;
         return 1;
@@ -54,98 +59,121 @@ int placeTower(Point* cursor, Tower towers[], TowerType* new, Map* map)
     return 0;
 }
 
-int addEnemy(Enemy enemies[], uint8_t x, uint8_t y, uint8_t dir, EnemyType* new)
+uint8_t addEnemy(Enemy enemies[], uint8_t x, uint8_t y, uint8_t dir, uint8_t type)
 {
-    uint8_t i;
-    uint8_t free = 255;
-    for(i = 0; i < 225; i++)
+    for(uint8_t i = 0; i < 225; i++)
     {
-        if(!enemies[i].type)
+        if(enemies[i].type == ENEMY_TYPE_NONE)
         {
-            free = i;
-            break;
+            //We found a free spot, insert the enemy
+            enemies[i].type = type;
+            enemies[i].position.x = x;
+            enemies[i].position.y = y;
+            enemies[i].direction = dir;
+            enemies[i].toMove = 0;
+            enemies[i].health = enemyTypes[type].health;
+            enemies[i].isIced = 0;
+            return 1;
         }
-    }
-
-    if(free != 255)
-    {
-        //We found a spot, place the tower
-        enemies[free].type = new;
-        enemies[free].position.x = x;
-        enemies[free].position.y = y;
-        enemies[free].direction = dir;
-        enemies[free].toMove = 0;
-        enemies[free].health = new->health;
-        return 1;
     }
     return 0;
 }
 
-void damageEnemy(Enemy enemies[], Enemy* e, uint16_t damage, uint16_t* money)
+uint8_t addProjectile(Projectile projectiles[], uint8_t x, uint8_t y, uint8_t tx, uint8_t ty, uint8_t type)
+{
+    for(uint8_t i = 0; i < 255; i++)
+    {
+        if(projectiles[i].type == PROJECTILE_TYPE_NONE)
+        {
+            projectiles[i].type = type;
+            projectiles[i].timer = projectileTypes[type].life;
+            projectiles[i].source.x = x * 16 + 8;
+            projectiles[i].source.y = y * 16 + 8;
+            projectiles[i].position.x = x * 16 + 8;
+            projectiles[i].position.y = y * 16 + 8;
+            projectiles[i].target.x = tx + 8;
+            projectiles[i].target.y = ty + 8;
+
+            return 1;
+        }
+    }
+    return 0;
+}
+
+void damageEnemy(Enemy enemies[], Enemy* e, uint16_t damage, uint8_t iced, uint16_t* money)
 {
     if(e->health > damage)
     {
-        e->health -= damage;
-        e->type = e->type->contains;
+        e->type = enemyTypes[e->type].contains;
+        e->health = enemyTypes[e->type].health;
+        e->isIced = iced;
+        if(damage - 1 > 0)
+        {
+            damageEnemy(enemies, e, damage - 1, iced, money);
+        }
+
     }
     else
     {
-        e->type = NULL;
-        (*money)++;
+        e->type = ENEMY_TYPE_NONE;
     }
+    (*money)++;
 }
 
-void updateTowers(Tower towers[], Enemy enemies[], uint16_t* money)
+void updateTowers(Tower towers[], Enemy enemies[], Projectile projectiles[], uint16_t* money)
 {
-    uint8_t i, j;
-    for(i = 0; i < 225; i++)
+    for(uint8_t i = 0; i < 225; i++)
     {
-        if(towers[i].type)
+        if(towers[i].type != TOWER_TYPE_NONE)
         {
             if(towers[i].cooldown > 0)
             {
                 towers[i].cooldown--;
+                continue;
             }
-            else
+            
+            uint8_t radius = towerTypes[towers[i].type].radius;
+            uint16_t damage = towerTypes[towers[i].type].damage;
+            uint8_t displayEffect = 1;
+
+            //TODO: Fire on enemies in order (at first enemy in range!) -> maybe with an enemy index as attribute?
+            for(uint8_t j = 0; j < 225; j++)
             {
-                uint8_t radius = towers[i].type->radius;
-                uint16_t damage = towers[i].type->damage;
-                uint8_t fired = 0;
-
-                //TODO: Fire on enemies in order (at first enemy in range!) -> maybe with an enemy index as attribute?
-                for(j = 0; j < 225; j++)
+                if(enemies[j].type != ENEMY_TYPE_NONE)
                 {
-                    if(enemies[j].type)
+                    if(distanceTE(&enemies[j].position, &towers[i].position) <= radius)
                     {
-                        if(distanceTE(&enemies[j].position, &towers[i].position) <= radius)
-                        {
-                            if(!fired)
-                            {
-                                addEffect(towers[i].type->attack, &towers[i].position, &enemies[j].position,
-                                    towers[i].type->radius);
-                                towers[i].cooldown = towers[i].type->cooldown;
-                            }
+                        TowerType* type = &towerTypes[towers[i].type];
 
-                            if(towers[i].type->attack == ZAP)
+                        towers[i].cooldown = type->cooldown;
+                        
+                        if(type->attack == A_ZAP)
+                        {
+                            damageEnemy(enemies, &enemies[j], damage, 0, money);
+                            addEffect(E_ZAP, &towers[i].position, &enemies[j].position, type->radius);
+                            //ZAP can only fire at one enemy, we're done
+                            break;
+                        }
+                        else if(type->attack == A_ICE)
+                        {
+                            //TODO: Slow the enemy down instead of damaging it - or maybe both?
+                            damageEnemy(enemies, &enemies[j], damage, 1, money);
+                            if(displayEffect)
                             {
-                                damageEnemy(enemies, &enemies[j], damage, money);
-                                //ZAP can only fire at one enemy, we're done
-                                break;
-                            }
-                            else if(towers[i].type->attack == ICE)
-                            {
-                                //TODO: Slow the enemy down instead of damaging it - or maybe both?
-                                damageEnemy(enemies, &enemies[j], damage, money);
+                                addEffect(E_ICE, &towers[i].position, &enemies[j].position, type->radius);
                                 //Keep going, but don't add multiple effects
-                                fired = 1;
+                                displayEffect = 0;
                             }
-                            else if(towers[i].type->attack == FIRE)
-                            {
-                                //TODO: Maybe actually spawn a projectile and see if it hits?
-                                damageEnemy(enemies, &enemies[j], damage, money);
-                                //FIRE can only fire at one enemy, we're done
-                                break;
-                            }
+                        }
+                        else if(type->attack == A_FIRE)
+                        {
+                            addProjectile(projectiles, towers[i].position.x, towers[i].position.y, enemies[j].position.x, enemies[j].position.y, 0);
+                            break;
+                        }
+                        else if(type->attack == A_CANNON)
+                        {
+                            addProjectile(projectiles, towers[i].position.x, towers[i].position.y, enemies[j].position.x, enemies[j].position.y, 1);
+                            break;
                         }
                     }
                 }
@@ -154,14 +182,12 @@ void updateTowers(Tower towers[], Enemy enemies[], uint16_t* money)
     }
 }
 
-//TODO: Allows speeds slower than 1
 uint8_t updateEnemies(Enemy enemies[], Map* map, Game* game)
 {
-    uint8_t i;
     uint8_t hasEnemies = 0;
-    for(i = 0; i < 225; i++)
+    for(uint8_t i = 0; i < 225; i++)
     {
-        if(enemies[i].type)
+        if(enemies[i].type != ENEMY_TYPE_NONE)
         {
             hasEnemies = 1;
 
@@ -169,12 +195,12 @@ uint8_t updateEnemies(Enemy enemies[], Map* map, Game* game)
             uint8_t y = enemies[i].position.y / 16;
 
             //Check all directions
-            if(!enemies[i].toMove)
+            if(enemies[i].toMove <= 0)
             {
                 if(tileIsEnd(map, x, y))
                 {
                     game->lives -= enemies[i].health;
-                    enemies[i].type = NULL;
+                    enemies[i].type = ENEMY_TYPE_NONE;
                     continue;
                 }
                 else
@@ -186,35 +212,74 @@ uint8_t updateEnemies(Enemy enemies[], Map* map, Game* game)
                         enemies[i].direction = 1;
                     }
                     enemies[i].toMove = 16;
+                    enemies[i].posDiff = 0;
                 }
             }
 
-            enemies[i].toMove -= enemies[i].type->speed;
-            switch(enemies[i].direction)
+            enemies[i].toMove -= enemyTypes[enemies[i].type].speed;
+            enemies[i].posDiff += enemyTypes[enemies[i].type].speed;
+            while(enemies[i].posDiff >= 1)
             {
-                case 0:
+                enemies[i].posDiff -= 1.0f;
+                switch(enemies[i].direction)
                 {
-                    enemies[i].position.y -= enemies[i].type->speed;
-                    break;
-                }
-                case 1:
-                {
-                    enemies[i].position.y += enemies[i].type->speed;
-                    break;
-                }
-                case 2:
-                {
-                    enemies[i].position.x -= enemies[i].type->speed;
-                    break;
-                }
-                case 3:
-                {
-                    enemies[i].position.x += enemies[i].type->speed;
-                    break;
+                    case 0:
+                    {
+                        enemies[i].position.y--;
+                        break;
+                    }
+                    case 1:
+                    {
+                        enemies[i].position.y++;
+                        break;
+                    }
+                    case 2:
+                    {
+                        enemies[i].position.x--;
+                        break;
+                    }
+                    case 3:
+                    {
+                        enemies[i].position.x++;
+                        break;
+                    }
                 }
             }
         }
     }
 
     return hasEnemies;
+}
+
+uint8_t updateProjectiles(Projectile projectiles[], Enemy enemies[], uint16_t* money)
+{
+    uint8_t hasProjectiles = 0;
+
+    for(uint8_t i = 0; i < 225; i++)
+    {
+        if(projectiles[i].type != PROJECTILE_TYPE_NONE)
+        {
+            hasProjectiles = 1;
+
+            projectiles[i].position.x = lerp(projectiles[i].target.x, projectiles[i].source.x, projectiles[i].timer / (float) projectileTypes[projectiles[i].type].life);
+            projectiles[i].position.y = lerp(projectiles[i].target.y, projectiles[i].source.y, projectiles[i].timer / (float) projectileTypes[projectiles[i].type].life);
+            projectiles[i].timer--;
+            if(!projectiles[i].timer)
+            {
+                projectiles[i].type = PROJECTILE_TYPE_NONE;
+            }
+
+            for(uint8_t j = 0; j < 225; j++)
+            {
+                if(hitPE(&enemies[j].position, &projectiles[i].position))
+                {
+                    damageEnemy(enemies, &enemies[j], projectileTypes[projectiles[i].type].damage, 0, money);
+                    projectiles[i].type = PROJECTILE_TYPE_NONE;
+                    break;
+                }
+            }
+        }
+    }
+
+    return hasProjectiles;
 }

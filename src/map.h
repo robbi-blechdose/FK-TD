@@ -20,7 +20,7 @@ typedef struct {
     LogicTile logicTiles[MAP_WIDTH * MAP_HEIGHT];
 } Map;
 
-#define NUM_MAPS 2
+#define NUM_MAPS 4
 extern Map maps[NUM_MAPS];
 
 LogicTile getTileAtPos(Map* map, uint8_t x, uint8_t y);

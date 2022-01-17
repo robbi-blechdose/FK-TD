@@ -21,7 +21,7 @@ void spawnEnemy(Enemy enemies[], uint8_t wave)
     {
         enemyIndex = 5;
     }
-    addEnemy(enemies, startPoint.x, startPoint.y, 1, &enemyTypes[enemyIndex]);
+    addEnemy(enemies, startPoint.x, startPoint.y, 1, enemyIndex);
     rcount--;
 }
 
