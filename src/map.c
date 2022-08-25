@@ -191,23 +191,15 @@ LogicTile getTileAtPos(Map* map, uint8_t x, uint8_t y)
     return map->logicTiles[x + y * MAP_WIDTH];
 }
 
-uint8_t tileIsEnd(Map* map, uint8_t x, uint8_t y)
+bool tileIsEnd(Map* map, uint8_t x, uint8_t y)
 {
-    if(getTileAtPos(map, x, y) == E)
-    {
-        return 1;
-    }
-    return 0;
+    return getTileAtPos(map, x, y) == E;
 }
 
-uint8_t tileIsReserved(Map* map, uint8_t x, uint8_t y)
+bool tileIsReserved(Map* map, uint8_t x, uint8_t y)
 {
     LogicTile t = getTileAtPos(map, x, y);
-    if(t == U || t == D || t == L || t == R || t == S || t == E || t == W)
-    {
-        return 1;
-    }
-    return 0;
+    return t == U || t == D || t == L || t == R || t == S || t == E || t == W;
 }
 
 Point getStartPos(Map* map)

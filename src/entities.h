@@ -3,6 +3,8 @@
 
 #include <SDL.h>
 #include <stdint.h>
+#include <stdbool.h>
+
 #include "utils.h"
 #include "map.h"
 #include "effects.h"
@@ -84,12 +86,12 @@ extern EnemyType enemyTypes[NUM_ENEMY_TYPES];
 #define PROJECTILE_TYPE_NONE 255
 extern ProjectileType projectileTypes[NUM_PROJECTILE_TYPES];
 
-uint8_t placeTower(Point* cursor, Tower towers[], uint8_t type, Map* map);
-uint8_t addEnemy(Enemy enemies[], uint8_t x, uint8_t y, uint8_t dir, uint8_t type);
-uint8_t addProjectile(Projectile projectiles[], uint8_t x, uint8_t y, uint8_t tx, uint8_t ty, uint8_t type);
+bool placeTower(Point* cursor, Tower towers[], uint8_t type, Map* map);
+bool addEnemy(Enemy enemies[], uint8_t x, uint8_t y, uint8_t dir, uint8_t type);
+bool addProjectile(Projectile projectiles[], uint8_t x, uint8_t y, uint8_t tx, uint8_t ty, uint8_t type);
 
 void updateTowers(Tower towers[], Enemy enemies[], Projectile projectiles[], uint16_t* money);
-uint8_t updateEnemies(Enemy enemies[], Map* map, Game* game);
-uint8_t updateProjectiles(Projectile projectiles[], Enemy enemies[], uint16_t* money);
+bool updateEnemies(Enemy enemies[], Map* map, Game* game);
+bool updateProjectiles(Projectile projectiles[], Enemy enemies[], uint16_t* money);
 
 #endif

@@ -2,7 +2,9 @@
 #define _MAP_H
 
 #include <stdint.h>
+#include <stdbool.h>
 #include <SDL/SDL.h>
+
 #include "utils.h"
 
 #define NUM_RENDER_TILES 13
@@ -24,8 +26,8 @@ typedef struct {
 extern Map maps[NUM_MAPS];
 
 LogicTile getTileAtPos(Map* map, uint8_t x, uint8_t y);
-uint8_t tileIsEnd(Map* map, uint8_t x, uint8_t y);
-uint8_t tileIsReserved(Map* map, uint8_t x, uint8_t y);
+bool tileIsEnd(Map* map, uint8_t x, uint8_t y);
+bool tileIsReserved(Map* map, uint8_t x, uint8_t y);
 Point getStartPos(Map* map);
 
 #endif

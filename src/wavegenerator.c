@@ -25,11 +25,11 @@ void spawnEnemy(Enemy enemies[], uint8_t wave)
     rcount--;
 }
 
-uint8_t updateWaveGenerator(Enemy enemies[], uint8_t wave)
+bool updateWaveGenerator(Enemy enemies[], uint8_t wave)
 {
     if(rcount == 0)
     {
-        return 0;
+        return false;
     }
 
     if(!rushActive && rand() < RAND_MAX / 500)
@@ -61,5 +61,5 @@ uint8_t updateWaveGenerator(Enemy enemies[], uint8_t wave)
             spawnEnemy(enemies, wave);
         }
     }
-    return 1;
+    return true;
 }

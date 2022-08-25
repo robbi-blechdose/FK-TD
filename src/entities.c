@@ -21,14 +21,14 @@ ProjectileType projectileTypes[NUM_PROJECTILE_TYPES] = {
     {.life = 10, .damage = 2, .radius = 16, .hitEffect = E_EXPLOSION, .tilePath = "res/projectiles/cannonball.png"}
 };
 
-uint8_t placeTower(Point* cursor, Tower towers[], uint8_t type, Map* map)
+bool placeTower(Point* cursor, Tower towers[], uint8_t type, Map* map)
 {
     uint8_t free = 255;
 
     if(tileIsReserved(map, cursor->x, cursor->y))
     {
         //Can't place here
-        return 0;
+        return false;
     }
     
     for(uint8_t i = 0; i < 225; i++)
@@ -39,7 +39,7 @@ uint8_t placeTower(Point* cursor, Tower towers[], uint8_t type, Map* map)
                 towers[i].position.y == cursor->y)
             {
                 //Position is already taken
-                return 0;
+                return false;
             }
         }
         else if(free == 255)
@@ -54,12 +54,12 @@ uint8_t placeTower(Point* cursor, Tower towers[], uint8_t type, Map* map)
         towers[free].type = type;
         towers[free].position.x = cursor->x;
         towers[free].position.y = cursor->y;
-        return 1;
+        return true;
     }
-    return 0;
+    return false;
 }
 
-uint8_t addEnemy(Enemy enemies[], uint8_t x, uint8_t y, uint8_t dir, uint8_t type)
+bool addEnemy(Enemy enemies[], uint8_t x, uint8_t y, uint8_t dir, uint8_t type)
 {
     for(uint8_t i = 0; i < 225; i++)
     {
@@ -73,13 +73,13 @@ uint8_t addEnemy(Enemy enemies[], uint8_t x, uint8_t y, uint8_t dir, uint8_t typ
             enemies[i].toMove = 0;
             enemies[i].health = enemyTypes[type].health;
             enemies[i].isIced = 0;
-            return 1;
+            return true;
         }
     }
-    return 0;
+    return false;
 }
 
-uint8_t addProjectile(Projectile projectiles[], uint8_t x, uint8_t y, uint8_t tx, uint8_t ty, uint8_t type)
+bool addProjectile(Projectile projectiles[], uint8_t x, uint8_t y, uint8_t tx, uint8_t ty, uint8_t type)
 {
     for(uint8_t i = 0; i < 255; i++)
     {
@@ -94,10 +94,10 @@ uint8_t addProjectile(Projectile projectiles[], uint8_t x, uint8_t y, uint8_t tx
             projectiles[i].target.x = tx + 8;
             projectiles[i].target.y = ty + 8;
 
-            return 1;
+            return true;
         }
     }
-    return 0;
+    return false;
 }
 
 void damageEnemy(Enemy enemies[], Enemy* e, uint16_t damage, uint8_t iced, uint16_t* money)
@@ -182,14 +182,15 @@ void updateTowers(Tower towers[], Enemy enemies[], Projectile projectiles[], uin
     }
 }
 
-uint8_t updateEnemies(Enemy enemies[], Map* map, Game* game)
+bool updateEnemies(Enemy enemies[], Map* map, Game* game)
 {
-    uint8_t hasEnemies = 0;
+    bool hasEnemies = false;
+
     for(uint8_t i = 0; i < 225; i++)
     {
         if(enemies[i].type != ENEMY_TYPE_NONE)
         {
-            hasEnemies = 1;
+            hasEnemies = true;
 
             uint8_t x = enemies[i].position.x / 16;
             uint8_t y = enemies[i].position.y / 16;
@@ -251,15 +252,15 @@ uint8_t updateEnemies(Enemy enemies[], Map* map, Game* game)
     return hasEnemies;
 }
 
-uint8_t updateProjectiles(Projectile projectiles[], Enemy enemies[], uint16_t* money)
+bool updateProjectiles(Projectile projectiles[], Enemy enemies[], uint16_t* money)
 {
-    uint8_t hasProjectiles = 0;
+    bool hasProjectiles = false;
 
     for(uint8_t i = 0; i < 225; i++)
     {
         if(projectiles[i].type != PROJECTILE_TYPE_NONE)
         {
-            hasProjectiles = 1;
+            hasProjectiles = true;
 
             projectiles[i].position.x = lerp(projectiles[i].target.x, projectiles[i].source.x, projectiles[i].timer / (float) projectileTypes[projectiles[i].type].life);
             projectiles[i].position.y = lerp(projectiles[i].target.y, projectiles[i].source.y, projectiles[i].timer / (float) projectileTypes[projectiles[i].type].life);
