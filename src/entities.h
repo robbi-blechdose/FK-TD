@@ -60,6 +60,8 @@ typedef struct {
     uint8_t frames;
     uint8_t life;
     uint8_t damage;
+    uint8_t radius;
+    EffectType hitEffect;
 } ProjectileType;
 
 typedef struct {

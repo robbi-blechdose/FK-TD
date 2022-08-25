@@ -2,7 +2,7 @@
 Type=Application
 Name=FK-TD
 Comment=Tower Defense Game
-Exec=main-funkey.elf
+Exec=main.elf
 Icon=icon
 Terminal=false
 Categories=games;

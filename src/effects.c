@@ -1,5 +1,9 @@
 #include "effects.h"
 
+const uint8_t effectTimers[] = {
+    0, 5, 5, 10
+};
+
 Effect effects[255];
 
 SDL_Surface* explosion;
@@ -9,17 +13,17 @@ void initEffects()
     explosion = loadPNG("res/effects/explosion.png");
 }
 
-void addEffect(EffectType t, Point* tower, Point* enemy, uint8_t radius)
+void addEffect(EffectType t, uint8_t x, uint8_t y, Point* enemy, uint8_t radius)
 {
     for(uint8_t i = 0; i < 255; i++)
     {
         if(effects[i].type == E_NONE)
         {
             effects[i].type = t;
-            effects[i].timer = 5;
+            effects[i].timer = effectTimers[t];
             effects[i].radius = radius * 16;
-            effects[i].a.x = tower->x * 16 + 8;
-            effects[i].a.y = tower->y * 16 + 8;
+            effects[i].a.x = x;
+            effects[i].a.y = y;
             effects[i].b.x = enemy->x + 8;
             effects[i].b.y = enemy->y + 8;
             effects[i].middle.x = effects[i].a.x + (effects[i].b.x - effects[i].a.x) / 2;

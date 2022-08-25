@@ -1,4 +1,3 @@
-PNAME		= main-funkey.elf
 CC			= /opt/funkey-sdk/usr/bin/arm-linux-gcc
-CFLAGS		+= -O3 -fdata-sections -ffunction-sections -flto -DFUNKEY
-LDFLAGS		+= -ldl -lasound -lpng -ljpeg -lmikmod -logg -lvorbisidec -lmpg123 -lfreetype -lbz2 -Wl,--as-needed -Wl,--gc-sections -flto -s
+SDL_GFX_LIB	= ~/Documents/Projects/FunKey/SDL_gfx/build/SDL_gfx_fk.a
+CFLAGS     += -march=armv7-a+neon-vfpv4 -mtune=cortex-a7 -mfpu=neon-vfpv4 -DFUNKEY=1

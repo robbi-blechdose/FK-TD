@@ -4,7 +4,7 @@ make oclean
 make TARGET=funkey
 
 mkdir -p opk
-cp  main-funkey.elf opk/main-funkey.elf
+cp  main.elf opk/main.elf
 cp -r ./res opk/res
 cp icon.png opk/icon.png
 cp fk-td.funkey-s.desktop opk/fk-td.funkey-s.desktop

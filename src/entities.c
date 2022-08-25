@@ -1,10 +1,10 @@
 #include "entities.h"
 
 TowerType towerTypes[NUM_TOWER_TYPES] = {
-    {.attack = A_ZAP, .cost = 50, .cooldown = 50, .damage = 1, .radius = 2, .tilePath = "res/towers/zap_tower.png", .frames = 2},
-    {.attack = A_ICE, .cost = 75, .cooldown = 75, .damage = 0, .radius = 2, .tilePath = "res/towers/ice_tower.png", .frames = 2},
-    {.attack = A_FIRE, .cost = 100, .cooldown = 20, .damage = 1, .radius = 3, .tilePath = "res/towers/fire_tower.png", .frames = 2},
-    {.attack = A_CANNON, .cost = 100, .cooldown = 60, .damage = 8, .radius = 4, .tilePath = "res/towers/cannon_tower.png", .frames = 2}
+    {.attack = A_ZAP,    .cost = 35, .cooldown = 50, .damage = 1, .radius = 2, .tilePath = "res/towers/zap_tower.png", .frames = 2},
+    {.attack = A_ICE,    .cost = 50, .cooldown = 75, .damage = 0, .radius = 2, .tilePath = "res/towers/ice_tower.png", .frames = 2},
+    {.attack = A_FIRE,   .cost = 70, .cooldown = 20, .damage = 1, .radius = 3, .tilePath = "res/towers/fire_tower.png", .frames = 2},
+    {.attack = A_CANNON, .cost = 55, .cooldown = 60, .damage = 8, .radius = 4, .tilePath = "res/towers/cannon_tower.png", .frames = 2}
 };
 
 EnemyType enemyTypes[NUM_ENEMY_TYPES] = {
@@ -17,8 +17,8 @@ EnemyType enemyTypes[NUM_ENEMY_TYPES] = {
 };
 
 ProjectileType projectileTypes[NUM_PROJECTILE_TYPES] = {
-    {.life =  5, .damage = 1, .tilePath = "res/projectiles/fireball.png"},
-    {.life = 10, .damage = 2, .tilePath = "res/projectiles/cannonball.png"}
+    {.life =  5, .damage = 1, .radius =  8, .hitEffect = E_NONE,      .tilePath = "res/projectiles/fireball.png"},
+    {.life = 10, .damage = 2, .radius = 16, .hitEffect = E_EXPLOSION, .tilePath = "res/projectiles/cannonball.png"}
 };
 
 uint8_t placeTower(Point* cursor, Tower towers[], uint8_t type, Map* map)
@@ -150,7 +150,7 @@ void updateTowers(Tower towers[], Enemy enemies[], Projectile projectiles[], uin
                         if(type->attack == A_ZAP)
                         {
                             damageEnemy(enemies, &enemies[j], damage, 0, money);
-                            addEffect(E_ZAP, &towers[i].position, &enemies[j].position, type->radius);
+                            addEffect(E_ZAP, towers[i].position.x * 16 + 8, towers[i].position.y * 16 + 8, &enemies[j].position, type->radius);
                             //ZAP can only fire at one enemy, we're done
                             break;
                         }
@@ -160,7 +160,7 @@ void updateTowers(Tower towers[], Enemy enemies[], Projectile projectiles[], uin
                             damageEnemy(enemies, &enemies[j], damage, 1, money);
                             if(displayEffect)
                             {
-                                addEffect(E_ICE, &towers[i].position, &enemies[j].position, type->radius);
+                                addEffect(E_ICE, towers[i].position.x * 16 + 8, towers[i].position.y * 16 + 8, &enemies[j].position, type->radius);
                                 //Keep going, but don't add multiple effects
                                 displayEffect = 0;
                             }
@@ -271,11 +271,15 @@ uint8_t updateProjectiles(Projectile projectiles[], Enemy enemies[], uint16_t* m
 
             for(uint8_t j = 0; j < 225; j++)
             {
-                if(hitPE(&enemies[j].position, &projectiles[i].position))
+                if(hitPE(&enemies[j].position, &projectiles[i].position, projectileTypes[projectiles[i].type].radius))
                 {
+                    if(projectileTypes[projectiles[i].type].hitEffect != E_NONE)
+                    {
+                        Point zero = {0, 0};
+                        addEffect(projectileTypes[projectiles[i].type].hitEffect, projectiles[i].position.x, projectiles[i].position.y, &zero, 0);
+                    }
                     damageEnemy(enemies, &enemies[j], projectileTypes[projectiles[i].type].damage, 0, money);
                     projectiles[i].type = PROJECTILE_TYPE_NONE;
-                    break;
                 }
             }
         }

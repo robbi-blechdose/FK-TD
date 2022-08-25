@@ -1,7 +1,5 @@
 #include "renderer.h"
 
-//TODO: Draw projectiles
-
 SDL_Surface* titleScreen;
 SDL_Surface* loseScreen;
 
@@ -31,7 +29,7 @@ HUDElement hudElements[NUM_TOWER_TYPES] = {
     {.tower = 3, .position = {.x = 96 + 56, .y = 12 * 16}, .name = "Cannon"}
 };
 
-void initRenderer(SDL_Surface* screen)
+void initRenderer()
 {
     IMG_Init(IMG_INIT_PNG);
     animCounter = 0;

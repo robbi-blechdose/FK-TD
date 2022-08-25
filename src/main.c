@@ -132,7 +132,7 @@ void calcFrame()
                 }
             }
 
-            if(keyUp(A))
+            if(keyUp(B_A))
             {
                 if(cursorMode == CURSOR_MAP && selectedTower != TOWER_TYPE_NONE)
                 {
@@ -152,14 +152,14 @@ void calcFrame()
                     //TODO: Play "selected" sound
                 }
             }
-            else if(keyUp(B))
+            else if(keyUp(B_B))
             {
                 if(selectedTower)
                 {
                     selectedTower = TOWER_TYPE_NONE;
                 }
             }
-            else if(keyUp(K))
+            else if(keyUp(B_SELECT))
             {
                 //Swap cursors
                 Point temp;
@@ -277,8 +277,8 @@ void drawFrame()
 int main(int argc, char **argv)
 {
     //Setup SDL
-    SDL_Init(SDL_INIT_VIDEO);
-    screen = SDL_SetVideoMode(240, 240, 16, 0);
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
+    screen = SDL_SetVideoMode(240, 240, 16, SDL_SWSURFACE);
     SDL_ShowCursor(SDL_DISABLE);
     //Setup framerate
     SDL_initFramerate(&fpsManager);
@@ -287,7 +287,7 @@ int main(int argc, char **argv)
 
     state = STATE_MENU;
     mapSelectIndex = 0;
-    initRenderer(screen);
+    initRenderer();
     initEffects();
 
     //Main loop

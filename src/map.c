@@ -1,6 +1,6 @@
 #include "map.h"
 
-Map maps[NUM_MAPS] = {
+const Map maps[NUM_MAPS] = {
     //By Robbi
     {
         .displayTiles = {
