@@ -1,9 +1,10 @@
 #ifndef _INPUT_H
 #define _INPUT_H
 
-#include <SDL.h>
+#include <stdbool.h>
+#include <SDL/SDL.h>
 
-#define NUM_KEYS 14
+#define NUM_KEYS 13
 
 typedef enum {
     //Keypad
@@ -12,23 +13,22 @@ typedef enum {
     B_LEFT,
     B_RIGHT,
     //ABXY
-    A,
-    B,
-    X,
-    Y,
-    //Shoulder buttons
-    M,
-    N,
-    //Power, Start, Select
-    Q,
-    K,
-    B_START,
-    //Debug key (PC only, the FK doesn't have it)
-    Z
+    B_A,
+    B_B,
+    B_X,
+    B_Y,
+    //Shoulder (trigger) buttons
+    B_TL,
+    B_TR,
+    //Menu, Start, Select
+    B_MENU,
+    B_SELECT,
+    B_START
 } Key;
 
-uint8_t handleInput();
-uint8_t keyPressed(Key key);
-uint8_t keyUp(Key key);
+bool handleInput();
+bool keyPressed(Key key);
+bool keyUp(Key key);
+bool keyDown(Key key);
 
 #endif
