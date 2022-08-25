@@ -26,7 +26,6 @@ typedef struct {
     uint16_t cost;
 
     char* tilePath;
-    SDL_Surface* tile;
     uint8_t frames;
 } TowerType;
 
@@ -43,7 +42,6 @@ struct EnemyType {
     uint8_t contains;
 
     char* tilePath;
-    SDL_Surface* tile;
 };
 
 typedef struct {
@@ -58,7 +56,6 @@ typedef struct {
 
 typedef struct {
     char* tilePath;
-    SDL_Surface* tile;
     uint8_t frames;
     uint8_t life;
     uint8_t damage;
@@ -76,15 +73,18 @@ typedef struct {
 
 #define NUM_TOWER_TYPES 4
 #define TOWER_TYPE_NONE 255
-extern TowerType towerTypes[NUM_TOWER_TYPES];
+extern const TowerType towerTypes[NUM_TOWER_TYPES];
+extern SDL_Surface* towerTiles[NUM_TOWER_TYPES];
 
 #define NUM_ENEMY_TYPES 6
 #define ENEMY_TYPE_NONE 255
-extern EnemyType enemyTypes[NUM_ENEMY_TYPES];
+extern const EnemyType enemyTypes[NUM_ENEMY_TYPES];
+extern SDL_Surface* enemyTiles[NUM_ENEMY_TYPES];
 
 #define NUM_PROJECTILE_TYPES 2
 #define PROJECTILE_TYPE_NONE 255
-extern ProjectileType projectileTypes[NUM_PROJECTILE_TYPES];
+extern const ProjectileType projectileTypes[NUM_PROJECTILE_TYPES];
+extern SDL_Surface* projectileTiles[NUM_PROJECTILE_TYPES];
 
 bool placeTower(Point* cursor, Tower towers[], uint8_t type, Map* map);
 bool addEnemy(Enemy enemies[], uint8_t x, uint8_t y, uint8_t dir, uint8_t type);

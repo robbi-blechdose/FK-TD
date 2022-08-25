@@ -210,8 +210,7 @@ Point getStartPos(Map* map)
         {
             if(map->logicTiles[i + j * MAP_WIDTH] == S)
             {
-                Point p = {.x = i, .y = j};
-                return p;
+                return (Point) {.x = i, .y = j};
             }
         }
     }

@@ -9,7 +9,7 @@ void copyPoint(Point* dst, Point* src)
 
 bool hitPE(Point* enemy, Point* projectile, uint8_t radius)
 {
-    return sqrt(pow(enemy->x + 8 - projectile->x, 2) + pow(enemy->y + 8 - projectile->y, 2)) < radius;
+    return sqrtf(powf(enemy->x + 8 - projectile->x, 2) + powf(enemy->y + 8 - projectile->y, 2)) < radius;
 }
 
 uint8_t distanceTE(Point* enemy, Point* tower)

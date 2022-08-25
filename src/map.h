@@ -23,7 +23,7 @@ typedef struct {
 } Map;
 
 #define NUM_MAPS 6
-extern Map maps[NUM_MAPS];
+extern const Map maps[NUM_MAPS];
 
 LogicTile getTileAtPos(Map* map, uint8_t x, uint8_t y);
 bool tileIsEnd(Map* map, uint8_t x, uint8_t y);

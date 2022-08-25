@@ -1,13 +1,14 @@
 #include "entities.h"
 
-TowerType towerTypes[NUM_TOWER_TYPES] = {
+//Fixed data
+const TowerType towerTypes[NUM_TOWER_TYPES] = {
     {.attack = A_ZAP,    .cost = 35, .cooldown = 50, .damage = 1, .radius = 2, .tilePath = "res/towers/zap_tower.png", .frames = 2},
     {.attack = A_ICE,    .cost = 50, .cooldown = 75, .damage = 0, .radius = 2, .tilePath = "res/towers/ice_tower.png", .frames = 2},
     {.attack = A_FIRE,   .cost = 70, .cooldown = 20, .damage = 1, .radius = 3, .tilePath = "res/towers/fire_tower.png", .frames = 2},
     {.attack = A_CANNON, .cost = 55, .cooldown = 60, .damage = 8, .radius = 4, .tilePath = "res/towers/cannon_tower.png", .frames = 2}
 };
 
-EnemyType enemyTypes[NUM_ENEMY_TYPES] = {
+const EnemyType enemyTypes[NUM_ENEMY_TYPES] = {
     {.health = 1, .speed = 0.8f, .tilePath = "res/enemies/Enemy_0.png", .contains = ENEMY_TYPE_NONE},
     {.health = 2, .speed = 1.0f, .tilePath = "res/enemies/Enemy_1.png", .contains = 0},
     {.health = 3, .speed = 1.2f, .tilePath = "res/enemies/Enemy_2.png", .contains = 1},
@@ -16,10 +17,15 @@ EnemyType enemyTypes[NUM_ENEMY_TYPES] = {
     {.health = 6, .speed = 2.5f, .tilePath = "res/enemies/Enemy_5.png", .contains = 4}
 };
 
-ProjectileType projectileTypes[NUM_PROJECTILE_TYPES] = {
+const ProjectileType projectileTypes[NUM_PROJECTILE_TYPES] = {
     {.life =  5, .damage = 1, .radius =  8, .hitEffect = E_NONE,      .tilePath = "res/projectiles/fireball.png"},
     {.life = 10, .damage = 2, .radius = 16, .hitEffect = E_EXPLOSION, .tilePath = "res/projectiles/cannonball.png"}
 };
+
+//Graphics
+SDL_Surface* towerTiles[NUM_TOWER_TYPES];
+SDL_Surface* enemyTiles[NUM_ENEMY_TYPES];
+SDL_Surface* projectileTiles[NUM_PROJECTILE_TYPES];
 
 bool placeTower(Point* cursor, Tower towers[], uint8_t type, Map* map)
 {
@@ -143,7 +149,7 @@ void updateTowers(Tower towers[], Enemy enemies[], Projectile projectiles[], uin
                 {
                     if(distanceTE(&enemies[j].position, &towers[i].position) <= radius)
                     {
-                        TowerType* type = &towerTypes[towers[i].type];
+                        const TowerType* type = &towerTypes[towers[i].type];
 
                         towers[i].cooldown = type->cooldown;
                         
