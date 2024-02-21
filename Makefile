@@ -1,6 +1,6 @@
 CC          	= gcc
 
-CFLAGS			= -O0 -flto
+CFLAGS			= -Wall -O0 -flto
 LDFLAGS     	= -lSDL -lSDL_image -lm -lSDL_mixer -lmikmod -lz
 
 PNAME			= main.elf
@@ -16,7 +16,7 @@ include $(TARGET).mk
 endif
 
 # Files to be compiled
-SRCDIR 		=  ./src ./src/engine
+SRCDIR 		=  ./src ./src/engine ./src/entities
 VPATH		= $(SRCDIR)
 SRC_C		= $(foreach dir, $(SRCDIR), $(wildcard $(dir)/*.c))
 OBJS		= $(notdir $(patsubst %.c, %.o, $(SRC_C)))
@@ -31,5 +31,6 @@ $(OBJS): %.o : %.c
 debug: CFLAGS += -g
 debug: $(PNAME)
 
-oclean:
+clean:
 	rm *.o
+	rm $(PNAME)

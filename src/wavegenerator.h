@@ -1,12 +1,13 @@
-#ifndef _WAVEGENERATOR_H
-#define _WAVEGENERATOR_H
+#ifndef WAVEGENERATOR_H
+#define WAVEGENERATOR_H
 
 #include <stdbool.h>
 
-#include "entities.h"
-#include "utils.h"
+#include "engine/math.h"
 
-void initWaveGenerator(uint8_t wave, Point sp);
-bool updateWaveGenerator(Enemy enemies[], uint8_t wave);
+#include "entities/enemies.h"
+
+void initWaveGenerator(uint8_t wave, vec2i sp);
+bool updateWaveGenerator(Enemy* enemies, uint16_t maxEnemies, uint8_t wave);
 
 #endif

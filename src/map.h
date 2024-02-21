@@ -1,18 +1,26 @@
-#ifndef _MAP_H
-#define _MAP_H
+#ifndef MAP_H
+#define MAP_H
 
 #include <stdint.h>
 #include <stdbool.h>
 #include <SDL/SDL.h>
 
-#include "utils.h"
+#include "engine/math.h"
 
 #define NUM_RENDER_TILES 13
-#define NUM_LOGIC_TILES 8
+//TODO: remove start tile, replace with position in map struct
+//that would allow arbitrary starting directions instead of only down
 typedef enum {
     G, W, S, E,
-    U, D, L, R
+    U, D, L, R,
+    NUM_LOGIC_TILES
 } LogicTile;
+
+typedef struct {
+    char* path;
+    uint8_t frames;
+    SDL_Surface* tile;
+} RenderTile;
 
 #define MAP_WIDTH  15
 #define MAP_HEIGHT 12
@@ -25,9 +33,14 @@ typedef struct {
 #define NUM_MAPS 6
 extern const Map maps[NUM_MAPS];
 
+void initMap();
+void quitMap();
+
 LogicTile getTileAtPos(Map* map, uint8_t x, uint8_t y);
 bool tileIsEnd(Map* map, uint8_t x, uint8_t y);
 bool tileIsReserved(Map* map, uint8_t x, uint8_t y);
-Point getStartPos(Map* map);
+vec2i getStartPos(Map* map);
+
+void drawMap(SDL_Surface* screen, Map* map);
 
 #endif

@@ -13,22 +13,8 @@ SDL_Surface* loseScreen;
 SDL_Surface* cursorTile;
 
 uint8_t animCounter;
-RenderTile renderTiles[NUM_RENDER_TILES] = {
-    {.path = "res/tiles/Grass.png", .frames = 0},
-    {.path = "res/tiles/Water.png", .frames = 8},
-    {.path = "res/tiles/Start.png", .frames = 0},
-    {.path = "res/tiles/FunKey_S.png", .frames = 0},
-    {.path = "res/tiles/R_Up.png", .frames = 0},
-    {.path = "res/tiles/R_Down.png", .frames = 0},
-    {.path = "res/tiles/R_Left.png", .frames = 0},
-    {.path = "res/tiles/R_Right.png", .frames = 0},
-    {.path = "res/tiles/R_LD.png", .frames = 0},
-    {.path = "res/tiles/R_LU.png", .frames = 0},
-    {.path = "res/tiles/R_RD.png", .frames = 0},
-    {.path = "res/tiles/R_RU.png", .frames = 0},
-    {.path = "res/tiles/Sand.png", .frames = 0}
-};
 
+//TODO: replace with automatic layout
 HUDElement hudElements[NUM_TOWER_TYPES] = {
     {.tower = 0, .position = {.x = 0, .y = 12 * 16}, .name = "Zap"},
     {.tower = 1, .position = {.x = 48, .y = 12 * 16}, .name = "Ice"},
@@ -43,26 +29,6 @@ void initRenderer()
 
     //Load cursor
     cursorTile = loadPNG("res/Cursor.png");
-    //Load tiles
-    for(uint8_t i = 0; i < NUM_RENDER_TILES; i++)
-    {
-        renderTiles[i].tile = loadPNG(renderTiles[i].path);
-    }
-    //Load towers
-    for(uint8_t i = 0; i < NUM_TOWER_TYPES; i++)
-    {
-        towerTiles[i] = loadPNG(towerTypes[i].tilePath);
-    }
-    //Load enemies
-    for(uint8_t i = 0; i < NUM_ENEMY_TYPES; i++)
-    {
-        enemyTiles[i] = loadPNG(enemyTypes[i].tilePath);
-    }
-    //Load projectiles
-    for(uint8_t i = 0; i < NUM_PROJECTILE_TYPES; i++)
-    {
-        projectileTiles[i] = loadPNG(projectileTypes[i].tilePath);
-    }
     //Load font
     gfxPrimitivesSetFont(gfxPrimitivesFontdata, 8, 8);
 
@@ -82,7 +48,7 @@ void drawMenu(SDL_Surface* screen)
     {
         stringRGBA(screen, CENTER(11), 148, "PRESS START", 255, 255, 255, 255);
     }
-    stringRGBA(screen, CENTER(8), 200, "2021 - 2022", 255, 255, 255, 255);
+    stringRGBA(screen, CENTER(8), 200, "2021 - 2024", 255, 255, 255, 255);
     stringRGBA(screen, CENTER(15), 208, "Robbi Blechdose", 255, 255, 0, 255);
     stringRGBA(screen, CENTER(7), 216, "V13Loca", 255, 0, 255, 255);
     stringRGBA(screen, CENTER(9), 224, "bickman14", 192, 0, 255, 255);
@@ -106,75 +72,7 @@ void drawMapSelect(SDL_Surface* screen)
     }
 }
 
-void drawMap(SDL_Surface* screen, Map* map)
-{
-    for(uint8_t i = 0; i < MAP_WIDTH; i++)
-    {
-        for(uint8_t j = 0; j < MAP_HEIGHT; j++)
-        {
-            SDL_Rect pos = {.x = i * 16, .y = j * 16};
-            uint8_t index = map->displayTiles[i + j * MAP_WIDTH];
-            if(renderTiles[index].frames)
-            {
-                SDL_Rect rect = {.x = (animCounter / 16 % renderTiles[index].frames) * 16, .y = 0, .w = 16, .h = 16};
-                SDL_BlitSurface(renderTiles[index].tile, &rect, screen, &pos);
-            }
-            else
-            {
-                SDL_BlitSurface(renderTiles[index].tile, NULL, screen, &pos);
-            }
-        }
-    }
-
-    animCounter++;
-}
-
-void drawTowers(SDL_Surface* screen, Tower towers[])
-{
-    for(uint8_t i = 0; i < 225; i++)
-    {
-        if(towers[i].type != TOWER_TYPE_NONE)
-        {
-            SDL_Rect pos = {.x = towers[i].position.x * 16, .y = towers[i].position.y * 16};
-            if(towerTypes[towers[i].type].frames)
-            {
-                SDL_Rect rect = {.x = (animCounter / 16 % towerTypes[towers[i].type].frames) * 16, .y = 0, .w = 16, .h = 16};
-                SDL_BlitSurface(towerTiles[towers[i].type], &rect, screen, &pos);
-            }
-            else
-            {
-                SDL_BlitSurface(towerTiles[towers[i].type], NULL, screen, &pos);
-            }
-        }
-    }
-}
-
-void drawEnemies(SDL_Surface* screen, Enemy enemies[])
-{
-    for(uint8_t i = 0; i < 225; i++)
-    {
-        if(enemies[i].type != ENEMY_TYPE_NONE)
-        {
-            SDL_Rect rect = {.x = (animCounter / 8 % 2) * 14, .y = 0, .w = 14, .h = 14};
-            SDL_Rect pos = {.x = enemies[i].position.x + 1, .y = enemies[i].position.y + 1};
-            SDL_BlitSurface(enemyTiles[enemies[i].type], &rect, screen, &pos);
-        }
-    }
-}
-
-void drawProjectiles(SDL_Surface* screen, Projectile projectiles[])
-{
-    for(uint8_t i = 0; i < 225; i++)
-    {
-        if(projectiles[i].type != PROJECTILE_TYPE_NONE)
-        {
-            SDL_Rect rect = {.x = (animCounter / 8 % 2) * 8, .y = 0, .w = 8, .h = 8};
-            SDL_Rect pos = {.x = projectiles[i].position.x, .y = projectiles[i].position.y};
-            SDL_BlitSurface(projectileTiles[projectiles[i].type], &rect, screen, &pos);
-        }
-    }
-}
-
+//TODO
 void drawHUD(SDL_Surface* screen, Game* game)
 {
     boxRGBA(screen, 0, 12 * 16, 240, 240, 160, 82, 40, 255);
@@ -184,9 +82,9 @@ void drawHUD(SDL_Surface* screen, Game* game)
     for(uint8_t i = 0; i < NUM_TOWER_TYPES; i++)
     {
         SDL_Rect rect = {.x = 0, .y = 0, .w = 16, .h = 16};
-        SDL_BlitSurface(towerTiles[i], &rect, screen, &hudElements[i].position);
+        //SDL_BlitSurface(towerTiles[i], &rect, screen, &hudElements[i].position);
         stringRGBA(screen, hudElements[i].position.x + 16, hudElements[i].position.y, hudElements[i].name, 255, 255, 255, 255);
-        sprintf(buffer, "%d$", towerTypes[i].cost);
+        //sprintf(buffer, "%d$", towerTypes[i].cost);
         stringRGBA(screen, hudElements[i].position.x + 16, hudElements[i].position.y + 8, buffer, 255, 255, 255, 255);
     }
     //Stats
@@ -201,16 +99,17 @@ void drawHUD(SDL_Surface* screen, Game* game)
     stringRGBA(screen, 0, 230, buffer, 255, 255, 255, 255);
 }
 
-void drawCursor(SDL_Surface* screen, Point* cursor, uint8_t cursorMode, uint8_t selectedTower)
+//TODO
+void drawCursor(SDL_Surface* screen, vec2i* cursor, uint8_t cursorMode, uint8_t selectedTower)
 {
     if(cursorMode == CURSOR_MAP)
     {
         SDL_Rect pos = {.x = cursor->x * 16, .y = cursor->y * 16};
-        if(selectedTower != TOWER_TYPE_NONE)
+        if(selectedTower != TT_NONE)
         {
             SDL_Rect rect = {.x = 0, .y = 0, .w = 16, .h = 16};
-            SDL_BlitSurface(towerTiles[selectedTower], &rect, screen, &pos);
-            circleRGBA(screen, cursor->x * 16 + 8, cursor->y * 16 + 8, towerTypes[selectedTower].radius * 16, 255, 255, 255, 255);
+            //SDL_BlitSurface(towerTiles[selectedTower], &rect, screen, &pos);
+            //circleRGBA(screen, cursor->x * 16 + 8, cursor->y * 16 + 8, towerTypes[selectedTower].radius * 16, 255, 255, 255, 255);
         }
         SDL_BlitSurface(cursorTile, NULL, screen, &pos);
     }
