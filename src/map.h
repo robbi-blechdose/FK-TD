@@ -11,7 +11,7 @@
 //TODO: remove start tile, replace with position in map struct
 //that would allow arbitrary starting directions instead of only down
 typedef enum {
-    G, W, S, E,
+    G, W, E,
     U, D, L, R,
     NUM_LOGIC_TILES
 } LogicTile;
@@ -28,6 +28,7 @@ typedef struct {
 typedef struct {
     uint8_t displayTiles[MAP_WIDTH * MAP_HEIGHT];
     LogicTile logicTiles[MAP_WIDTH * MAP_HEIGHT];
+    vec2i startPosition;
 } Map;
 
 #define NUM_MAPS 6
@@ -39,7 +40,6 @@ void quitMap();
 LogicTile getTileAtPos(Map* map, uint8_t x, uint8_t y);
 bool tileIsEnd(Map* map, uint8_t x, uint8_t y);
 bool tileIsReserved(Map* map, uint8_t x, uint8_t y);
-vec2i getStartPos(Map* map);
 
 void drawMap(SDL_Surface* screen, Map* map);
 

@@ -84,7 +84,7 @@ void startWave()
 {
     game.wave++;
     game.waveActive = 1;
-    initWaveGenerator(game.wave, getStartPos(map));
+    initWaveGenerator(game.wave, map->startPosition);
 }
 
 void calcFrameGame()

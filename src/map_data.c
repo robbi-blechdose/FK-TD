@@ -18,7 +18,7 @@ const Map maps[NUM_MAPS] = {
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
         },
         .logicTiles = {
-        G, S, G, G, G, G, G, G, G, G, G, G, G, E, G,
+        G, D, G, G, G, G, G, G, G, G, G, G, G, E, G,
         G, D, G, G, G, G, G, G, G, G, G, G, G, U, G,
         G, D, G, G, G, G, G, G, G, G, G, G, G, U, G,
         G, D, G, G, G, G, G, G, G, G, G, G, R, U, G,
@@ -30,7 +30,8 @@ const Map maps[NUM_MAPS] = {
         G, D, G, U, G, G, D, G, W, W, W, W, G, U, G,
         G, R, R, U, G, G, R, R, R, R, R, R, R, U, G,
         G, G, G, G, G, G, G, G, G, G, G, G, G, G, G
-        }
+        },
+        .startPosition = (vec2i) {.x = 1, .y = 0}
     },
     {
         .displayTiles = {
@@ -48,7 +49,7 @@ const Map maps[NUM_MAPS] = {
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
         },
         .logicTiles = {
-        W, W, W, S, G, R, R, D, G, G, G, G, G, E, G,
+        W, W, W, D, G, R, R, D, G, G, G, G, G, E, G,
         W, D, L, R, R, U, G, D, G, R, R, R, R, U, G,
         W, D, U, G, G, G, G, D, G, U, G, G, G, G, G,
         W, D, U, G, G, G, G, D, G, U, G, G, G, G, G,
@@ -60,7 +61,8 @@ const Map maps[NUM_MAPS] = {
         G, D, G, G, G, G, G, G, G, G, G, G, G, U, G,
         G, R, R, R, R, R, R, R, R, R, R, R, R, U, G,
         G, G, G, G, G, G, G, G, G, G, G, G, G, G, G
-        }
+        },
+        .startPosition = (vec2i) {.x = 3, .y = 0}
     },
     //By Rinkuji
     {
@@ -79,7 +81,7 @@ const Map maps[NUM_MAPS] = {
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
         },
         .logicTiles = {
-        G, G, G, G, G, G, S, G, E, G, G, G, G, G, G,
+        G, G, G, G, G, G, D, G, E, G, G, G, G, G, G,
         G, D, L, G, G, G, D, G, U, G, G, G, D, L, G,
         G, D, U, L, G, G, D, G, U, G, G, D, L, U, G,
         G, D, G, U, L, G, D, G, U, G, D, L, G, U, G,
@@ -91,7 +93,8 @@ const Map maps[NUM_MAPS] = {
         G, G, G, D, G, R, R, R, R, D, G, U, G, G, G,
         G, G, G, R, R, U, G, G, G, R, R, U, G, G, G,
         G, G, G, G, G, G, G, G, G, G, G, G, G, G, G
-        }
+        },
+        .startPosition = (vec2i) {.x = 6, .y = 0}
     },
     //By V13Loca
     {
@@ -111,7 +114,7 @@ const Map maps[NUM_MAPS] = {
         },
         .logicTiles = {
         G, G, G, G, G, G, G, G, G, W, W, G, G, G, G,
-        G, D, L, L, G, S, G, G, W, W, W, G, G, E, G,
+        G, D, L, L, G, D, G, G, W, W, W, G, G, E, G,
         G, D, G, U, G, D, G, G, W, W, G, G, G, U, G,
         G, D, G, U, G, D, G, G, W, W, G, G, G, U, G,
         G, D, G, U, L, L, G, G, W, W, W, G, G, U, G,
@@ -122,7 +125,8 @@ const Map maps[NUM_MAPS] = {
         G, G, G, G, R, R, R, R, R, R, D, G, G, U, G,
         G, G, G, G, G, G, W, W, W, G, R, R, R, U, G,
         G, G, G, G, G, W, W, W, G, G, G, G, G, G, G,
-        }
+        },
+        .startPosition = (vec2i) {.x = 5, .y = 1}
     },
     {
         .displayTiles = {
@@ -141,7 +145,7 @@ const Map maps[NUM_MAPS] = {
         },
         .logicTiles = {
         G, G, G, G, G, G, G, G, G, G, G, G, G, G, G,
-        G, G, S, G, G, G, G, G, G, G, G, G, G, G, G,
+        G, G, D, G, G, G, G, G, G, G, G, G, G, G, G,
         G, D, L, G, D, L, L, L, L, L, L, L, L, G, G,
         G, D, G, D, L, G, G, G, G, G, G, G, U, L, G,
         G, D, G, D, G, D, L, L, L, L, L, L, G, U, G,
@@ -152,7 +156,8 @@ const Map maps[NUM_MAPS] = {
         G, R, D, G, G, G, G, G, G, G, G, G, R, U, G,
         G, G, R, R, R, R, R, R, R, R, R, R, U, G, G,
         G, G, G, G, G, G, G, G, G, G, G, G, G, G, G
-        }
+        },
+        .startPosition = (vec2i) {.x = 2, .y = 1}
     },
     {
         .displayTiles = {
@@ -171,7 +176,7 @@ const Map maps[NUM_MAPS] = {
         },
         .logicTiles = {
         G, G, G, G, G, G, G, G, G, G, G, G, G, G, G,
-        G, S, G, G, G, G, G, R, R, R, R, D, G, G, G,
+        G, D, G, G, G, G, G, R, R, R, R, D, G, G, G,
         G, D, G, G, G, G, R, U, G, G, G, R, D, G, G,
         G, D, G, G, G, G, U, G, G, G, G, G, D, G, G,
         G, D, G, G, G, G, U, L, G, G, G, G, D, G, G,
@@ -182,6 +187,7 @@ const Map maps[NUM_MAPS] = {
         G, G, G, G, G, G, G, D, G, G, G, G, G, G, G,
         G, G, G, G, G, G, G, R, R, R, R, R, R, E, G,
         G, G, G, G, G, G, G, G, G, G, G, G, G, G, G
-        }
+        },
+        .startPosition = (vec2i) {.x = 1, .y = 1}
     }
 };

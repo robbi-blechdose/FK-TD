@@ -118,12 +118,7 @@ void updateEnemy(Enemy* enemy, Map* map, Game* game)
     
     //Direction handling
     uint8_t previousDirection = enemy->direction;
-    enemy->direction = getTileAtPos(map, tilePosition.x, tilePosition.y) - 4;
-    //Start tile means move down!
-    if(getTileAtPos(map, tilePosition.x, tilePosition.y) == S)
-    {
-        enemy->direction = 1;
-    }
+    enemy->direction = getTileAtPos(map, tilePosition.x, tilePosition.y) - 3;
     
     //TODO: fix this "teleporting" the enemy when going left
     if(enemy->direction != previousDirection)
