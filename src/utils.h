@@ -12,6 +12,16 @@ typedef struct {
     uint8_t lives;
 } Game;
 
+/**
+ * Macro for centering text
+ * X is the length of the text
+ * Note: X * 8 / 2 = X * 4
+ **/
+#define CENTER(X) (240 / 2 - (X) * 4)
+
+void initPNG();
+void initFont();
+
 SDL_Surface* loadPNG(const char* path);
 
 #endif

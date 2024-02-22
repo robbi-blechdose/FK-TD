@@ -10,7 +10,8 @@
 #include "entities/projectiles.h"
 #include "entities/towers.h"
 
-#include "renderer.h"
+#include "gui/hud.h"
+#include "gui/menus.h"
 #include "utils.h"
 #include "wavegenerator.h"
 #include "effects.h"
@@ -33,9 +34,12 @@ GameState gameState;
 uint8_t mapSelectIndex;
 
 //Main game fields
-//TODO: Reduce this number?
+
+//TODO: consider replacing the tower list with an array the size of the map?
+//This would allow us to remove the position field entirely and just go by index
+
 #define MAX_TOWERS 225 //225 is the total number of 16x16 tiles that can be on screen at any time
-#define MAX_ENEMIES 225
+#define MAX_ENEMIES 1024
 #define MAX_PROJECTILES 255
 Tower towers[MAX_TOWERS];
 Enemy enemies[MAX_ENEMIES];
@@ -46,7 +50,7 @@ Game game;
 uint8_t cursorMode;
 vec2i cursorBackup;
 vec2i cursor;
-uint8_t selectedTower;
+TowerType selectedTower;
 
 void startGame()
 {
@@ -55,15 +59,15 @@ void startGame()
     game.money = 100;
     game.lives = 25;
     //Clear tower, enemy and projectile lists
-    for(uint8_t i = 0; i < MAX_TOWERS; i++)
+    for(uint16_t i = 0; i < MAX_TOWERS; i++)
     {
         towers[i].type = TT_NONE;
     }
-    for(uint8_t i = 0; i < MAX_ENEMIES; i++)
+    for(uint16_t i = 0; i < MAX_ENEMIES; i++)
     {
         enemies[i].type = ENT_NONE;
     }
-    for(uint8_t i = 0; i < MAX_PROJECTILES; i++)
+    for(uint16_t i = 0; i < MAX_PROJECTILES; i++)
     {
         projectiles[i].type = PT_NONE;
     }
@@ -134,7 +138,7 @@ void calcFrameGame()
         {
             //TODO
             //if(game.money >= towerTypes[selectedTower].cost && placeTower(&cursor, towers, selectedTower, map))
-            if(game.money >= 100 && placeTower(&cursor, towers, selectedTower, map))
+            if(game.money >= 100 && placeTower(&cursor, towers, MAX_TOWERS, selectedTower, map))
             {
                 game.money -= 100; //towerTypes[selectedTower].cost;
                 //TODO: Play "placed" sound
@@ -185,7 +189,7 @@ void calcFrameGame()
     if(game.waveActive)
     {
         //Update
-        updateTowers(towers, enemies, projectiles, &game.money);
+        updateTowers(towers, MAX_TOWERS, enemies, MAX_ENEMIES, projectiles, &game.money);
         bool hasEnemies = updateEnemies(enemies, MAX_ENEMIES, map, &game);
         bool hasWave = updateWaveGenerator(enemies, MAX_ENEMIES, game.wave);
         bool hasProjectiles = updateProjectiles(projectiles, enemies, &game.money);
@@ -267,7 +271,7 @@ void drawFrame()
         case STATE_GAME:
         {
             drawMap(screen, map);
-            drawTowers(screen, towers);
+            drawTowers(screen, towers, MAX_TOWERS);
             drawEnemies(screen, enemies, MAX_ENEMIES);
             drawProjectiles(screen, projectiles);
             drawHUD(screen, &game);
@@ -305,7 +309,11 @@ int main(int argc, char **argv)
     gameState = STATE_MENU;
     mapSelectIndex = 0;
 
-    initRenderer();
+    initPNG();
+    initFont();
+    initHUD();
+    initMenus();
+
     initEffects();
 
     initMap();

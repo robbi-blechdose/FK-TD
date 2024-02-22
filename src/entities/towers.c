@@ -26,12 +26,12 @@ void quitTowers()
     //TODO
 }
 
-void drawTowers(SDL_Surface* screen, Tower towers[])
+void drawTowers(SDL_Surface* screen, Tower* towers, uint16_t maxTowers)
 {
     //TODO
     int animCounter = 0;
 
-    for(uint8_t i = 0; i < 225; i++)
+    for(uint16_t i = 0; i < maxTowers; i++)
     {
         if(towers[i].type != TT_NONE)
         {
@@ -51,18 +51,29 @@ void drawTowers(SDL_Surface* screen, Tower towers[])
     }
 }
 
-bool placeTower(vec2i* cursor, Tower towers[], uint8_t type, Map* map)
+void drawTowerWithRange(SDL_Surface* screen, TowerType tower, vec2i position)
 {
-    //TODO: improve this
-    uint16_t free = 6969;
+    SDL_Rect pos = {.x = position.x, .y = position.y};
+    SDL_Rect rect = {.x = 0, .y = 0, .w = 16, .h = 16};
+    SDL_BlitSurface(towerTextures[tower], &rect, screen, &pos);
+    circleRGBA(screen, position.x + TOWER_TEXTURE_SIZE / 2,
+                        position.y + TOWER_TEXTURE_SIZE / 2,
+                        towerTypeData[tower].radius * 16, 255, 255, 255, 255); //TODO: replace 16 with map tile size constant
+}
 
+bool placeTower(vec2i* cursor, Tower* towers, uint16_t maxTowers, uint8_t type, Map* map)
+{
     if(tileIsReserved(map, cursor->x, cursor->y))
     {
         //Can't place here
         return false;
     }
+
+    bool hasFreeIndex = false;
+    uint16_t freeIndex = 0;
     
-    for(uint8_t i = 0; i < 225; i++)
+    //Find the first free index AND check all tower positions to make sure there's no tower in the same position
+    for(uint16_t i = 0; i < maxTowers; i++)
     {
         if(towers[i].type != TT_NONE)
         {
@@ -73,26 +84,27 @@ bool placeTower(vec2i* cursor, Tower towers[], uint8_t type, Map* map)
                 return false;
             }
         }
-        else if(free == 6969)
+        else if(!hasFreeIndex)
         {
-            free = i;
+            hasFreeIndex = true;
+            freeIndex = i;
         }
     }
 
-    if(free != 6969)
+    if(hasFreeIndex)
     {
         //We found a spot, place the tower
-        towers[free].type = type;
-        towers[free].position.x = cursor->x;
-        towers[free].position.y = cursor->y;
+        towers[freeIndex].type = type;
+        towers[freeIndex].position.x = cursor->x;
+        towers[freeIndex].position.y = cursor->y;
         return true;
     }
     return false;
 }
 
-void updateTowers(Tower towers[], Enemy enemies[], Projectile projectiles[], uint16_t* money)
+void updateTowers(Tower* towers, uint16_t maxTowers, Enemy* enemies, uint16_t maxEnemies, Projectile projectiles[], uint16_t* money)
 {
-    for(uint8_t i = 0; i < 225; i++)
+    for(uint16_t i = 0; i < maxTowers; i++)
     {
         if(towers[i].type == TT_NONE)
         {
@@ -110,7 +122,7 @@ void updateTowers(Tower towers[], Enemy enemies[], Projectile projectiles[], uin
         uint8_t displayEffect = 1;
 
         //TODO: Fire on enemies in order (at first enemy in range!) -> maybe with an enemy index as attribute?
-        for(uint8_t j = 0; j < 225; j++)
+        for(uint16_t j = 0; j < maxEnemies; j++)
         {
             if(enemies[j].type != ENT_NONE)
             {

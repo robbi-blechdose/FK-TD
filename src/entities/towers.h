@@ -52,9 +52,10 @@ typedef struct {
 void initTowers();
 void quitTowers();
 
-void drawTowers(SDL_Surface* screen, Tower towers[]);
+void drawTowers(SDL_Surface* screen, Tower* towers, uint16_t maxTowers);
+void drawTowerWithRange(SDL_Surface* screen, TowerType tower, vec2i position);
 
-bool placeTower(vec2i* cursor, Tower towers[], uint8_t type, Map* map);
-void updateTowers(Tower towers[], Enemy enemies[], Projectile projectiles[], uint16_t* money);
+bool placeTower(vec2i* cursor, Tower* towers, uint16_t maxTowers, uint8_t type, Map* map);
+void updateTowers(Tower* towers, uint16_t maxTowers, Enemy* enemies, uint16_t maxEnemies, Projectile projectiles[], uint16_t* money);
 
 #endif

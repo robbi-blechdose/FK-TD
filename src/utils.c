@@ -1,6 +1,18 @@
 #include "utils.h"
 
 #include <SDL_image.h>
+#include <SDL_gfxPrimitives.h>
+#include <SDL_gfxPrimitives_font.h>
+
+void initPNG()
+{
+    IMG_Init(IMG_INIT_PNG);
+}
+
+void initFont()
+{
+    gfxPrimitivesSetFont(gfxPrimitivesFontdata, 8, 8);
+}
 
 SDL_Surface* loadPNG(const char* path)
 {
