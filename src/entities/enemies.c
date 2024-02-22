@@ -110,7 +110,7 @@ void updateEnemy(Enemy* enemy, Map* map, Game* game)
     vec2i tilePosition = {.x = roundf(enemy->position.x), .y = roundf(enemy->position.y)};
 
     //TODO: move this (the effect of reaching the end tile) somewhere else?
-    if(enemy->toMove <= 0 && tileIsEnd(map, tilePosition.x, tilePosition.y))
+    if(enemy->toMove <= 0 && map->endPosition.x == tilePosition.x && map->endPosition.y == tilePosition.y)
     {
         //TODO: apply health from nested enemies...
         game->lives -= enemy->health;
@@ -147,7 +147,7 @@ void updateEnemy(Enemy* enemy, Map* map, Game* game)
     else
     {
         //Direction handling
-        enemy->direction = getTileAtPos(map, tilePosition.x, tilePosition.y) - 3;
+        enemy->direction = getTileAtPos(map, tilePosition.x, tilePosition.y) - 2; //TODO: remove magic number here
         enemy->toMove = 1;
     }
     

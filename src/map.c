@@ -39,16 +39,10 @@ LogicTile getTileAtPos(Map* map, uint8_t x, uint8_t y)
 {
     return map->logicTiles[x + y * MAP_WIDTH];
 }
-
-bool tileIsEnd(Map* map, uint8_t x, uint8_t y)
-{
-    return getTileAtPos(map, x, y) == E;
-}
-
 bool tileIsReserved(Map* map, uint8_t x, uint8_t y)
 {
     LogicTile t = getTileAtPos(map, x, y);
-    return t == U || t == D || t == L || t == R || t == E || t == W;
+    return t == U || t == D || t == L || t == R || t == W;
 }
 
 void drawMap(SDL_Surface* screen, Map* map)
