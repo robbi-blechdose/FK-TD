@@ -10,8 +10,8 @@ void initWaveGenerator(uint8_t wave, vec2i sp)
 {
     rcount = 12 * wave;
     rushActive = 0;
-    startPoint.x = sp.x * 16;
-    startPoint.y = sp.y * 16;
+    startPoint.x = sp.x;
+    startPoint.y = sp.y;
 }
 
 void spawnEnemy(Enemy* enemies, uint16_t maxEnemies, uint8_t wave)

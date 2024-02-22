@@ -2,6 +2,7 @@
 
 #include "../effects.h"
 
+//TODO: replace with map tile size?
 #define TOWER_TEXTURE_SIZE 16
 
 const TowerTypeData towerTypeData[NUM_TOWER_TYPES] = {
@@ -26,6 +27,22 @@ void quitTowers()
     //TODO
 }
 
+void drawTower(SDL_Surface* screen, TowerType tower, vec2i position)
+{
+    SDL_Rect pos = {.x = position.x, .y = position.y};
+    SDL_Rect rect = {.x = 0, .y = 0, .w = TOWER_TEXTURE_SIZE, .h = TOWER_TEXTURE_SIZE};
+    SDL_BlitSurface(towerTextures[tower], &rect, screen, &pos);
+}
+
+void drawTowerWithRange(SDL_Surface* screen, TowerType tower, vec2i position)
+{
+    drawTower(screen, tower, position);
+    circleRGBA(screen, position.x + TOWER_TEXTURE_SIZE / 2,
+                        position.y + TOWER_TEXTURE_SIZE / 2,
+                        towerTypeData[tower].radius * 16, 255, 255, 255, 255); //TODO: replace 16 with map tile size constant
+}
+
+//TODO: switch to using drawTower
 void drawTowers(SDL_Surface* screen, Tower* towers, uint16_t maxTowers)
 {
     //TODO
@@ -49,16 +66,6 @@ void drawTowers(SDL_Surface* screen, Tower* towers, uint16_t maxTowers)
             }
         }
     }
-}
-
-void drawTowerWithRange(SDL_Surface* screen, TowerType tower, vec2i position)
-{
-    SDL_Rect pos = {.x = position.x, .y = position.y};
-    SDL_Rect rect = {.x = 0, .y = 0, .w = 16, .h = 16};
-    SDL_BlitSurface(towerTextures[tower], &rect, screen, &pos);
-    circleRGBA(screen, position.x + TOWER_TEXTURE_SIZE / 2,
-                        position.y + TOWER_TEXTURE_SIZE / 2,
-                        towerTypeData[tower].radius * 16, 255, 255, 255, 255); //TODO: replace 16 with map tile size constant
 }
 
 bool placeTower(vec2i* cursor, Tower* towers, uint16_t maxTowers, uint8_t type, Map* map)

@@ -6,12 +6,12 @@
 #define ENEMY_TEXTURE_SIZE 14
 
 const EnemyTypeData enemyTypeData[NUM_ENEMY_TYPES] = {
-    [ENT_RED] =    {.containedType = ENT_NONE,   .health = 1, .speed = 0.8f, .moneyValue = 1, .tilePath = "res/enemies/Enemy_0.png"},
-    [ENT_BLUE] =   {.containedType = ENT_RED,    .health = 1, .speed = 1.0f, .moneyValue = 1,  .tilePath = "res/enemies/Enemy_1.png"},
-    [ENT_GREEN] =  {.containedType = ENT_BLUE,   .health = 1, .speed = 1.2f, .moneyValue = 1,  .tilePath = "res/enemies/Enemy_2.png"},
-    [ENT_YELLOW] = {.containedType = ENT_GREEN,  .health = 1, .speed = 1.5f, .moneyValue = 1,  .tilePath = "res/enemies/Enemy_3.png"},
-    [ENT_VIOLET] = {.containedType = ENT_YELLOW, .health = 1, .speed = 2.0f, .moneyValue = 1,  .tilePath = "res/enemies/Enemy_4.png"},
-    [ENT_SHIP] =   {.containedType = ENT_VIOLET, .health = 2, .speed = 2.5f, .moneyValue = 2,  .tilePath = "res/enemies/Enemy_5.png"}
+    [ENT_RED] =    {.containedType = ENT_NONE,   .health = 1, .speed = 0.8f / 16, .moneyValue = 1, .texturePath = "res/enemies/Enemy_0.png"},
+    [ENT_BLUE] =   {.containedType = ENT_RED,    .health = 1, .speed = 1.0f / 16, .moneyValue = 1, .texturePath = "res/enemies/Enemy_1.png"},
+    [ENT_GREEN] =  {.containedType = ENT_BLUE,   .health = 1, .speed = 1.2f / 16, .moneyValue = 1, .texturePath = "res/enemies/Enemy_2.png"},
+    [ENT_YELLOW] = {.containedType = ENT_GREEN,  .health = 1, .speed = 1.5f / 16, .moneyValue = 1, .texturePath = "res/enemies/Enemy_3.png"},
+    [ENT_VIOLET] = {.containedType = ENT_YELLOW, .health = 1, .speed = 2.0f / 16, .moneyValue = 1, .texturePath = "res/enemies/Enemy_4.png"},
+    [ENT_SHIP] =   {.containedType = ENT_VIOLET, .health = 2, .speed = 2.5f / 16, .moneyValue = 2, .texturePath = "res/enemies/Enemy_5.png"}
 };
 
 SDL_Surface* enemyTextures[NUM_ENEMY_TYPES];
@@ -20,7 +20,7 @@ void initEnemies()
 {
     for(uint8_t i = 0; i < NUM_ENEMY_TYPES; i++)
     {
-        enemyTextures[i] = loadPNG(enemyTypeData[i].tilePath);
+        enemyTextures[i] = loadPNG(enemyTypeData[i].texturePath);
     }
 }
 
@@ -31,8 +31,8 @@ void quitEnemies()
 
 void drawEnemies(SDL_Surface* screen, Enemy* enemies, uint16_t maxEnemies)
 {
-    //TODO
-    int animCounter = 0;
+    //TODO: move somewhere else?
+    static int animCounter = 0;
 
     for(uint16_t i = 0; i < maxEnemies; i++)
     {
@@ -41,11 +41,15 @@ void drawEnemies(SDL_Surface* screen, Enemy* enemies, uint16_t maxEnemies)
             SDL_Rect rect = {.x = (animCounter / 8 % 2) * ENEMY_TEXTURE_SIZE,
                                 .y = 0,
                                 .w = ENEMY_TEXTURE_SIZE, .h = ENEMY_TEXTURE_SIZE};
-            SDL_Rect pos = {.x = enemies[i].position.x - ENEMY_TEXTURE_SIZE / 2,
-                            .y = enemies[i].position.y - ENEMY_TEXTURE_SIZE / 2};
+            //TODO: replace 16 with map tile size
+            //TODO: remove magic constant 1 caused by difference between enemy and map tile size
+            SDL_Rect pos = {.x = enemies[i].position.x * 16 + 1,
+                            .y = enemies[i].position.y * 16 + 1};
             SDL_BlitSurface(enemyTextures[enemies[i].type], &rect, screen, &pos);
         }
     }
+
+    animCounter++;
 }
 
 bool addEnemy(Enemy* enemies, uint16_t maxEnemies, uint8_t x, uint8_t y, uint8_t dir, uint8_t type)
@@ -59,7 +63,6 @@ bool addEnemy(Enemy* enemies, uint16_t maxEnemies, uint8_t x, uint8_t y, uint8_t
             enemies[i].position.x = x;
             enemies[i].position.y = y;
             enemies[i].direction = dir;
-            enemies[i].toMove = 0;
             enemies[i].health = enemyTypeData[type].health;
             enemies[i].isIced = false;
             return true;
@@ -101,6 +104,60 @@ void damageEnemy(Enemy* enemy, uint16_t damage, bool iced, uint16_t* money)
     }
 }
 
+void updateEnemy(Enemy* enemy, Map* map, Game* game)
+{
+    vec2i tilePosition = {.x = enemy->position.x, .y = enemy->position.y};
+
+    //TODO: move this (the effect of reaching the end tile) somewhere else?
+    if(tileIsEnd(map, tilePosition.x, tilePosition.y))
+    {
+        //TODO: apply health from nested enemies...
+        game->lives -= enemy->health;
+        enemy->type = ENT_NONE;
+    }
+    
+    //Direction handling
+    uint8_t previousDirection = enemy->direction;
+    enemy->direction = getTileAtPos(map, tilePosition.x, tilePosition.y) - 4;
+    //Start tile means move down!
+    if(getTileAtPos(map, tilePosition.x, tilePosition.y) == S)
+    {
+        enemy->direction = 1;
+    }
+    
+    //TODO: fix this "teleporting" the enemy when going left
+    if(enemy->direction != previousDirection)
+    {
+        //Snap enemy to tile
+        enemy->position.x = tilePosition.x;
+        enemy->position.y = tilePosition.y;
+    }
+
+    switch(enemy->direction)
+    {
+        case 0:
+        {
+            enemy->position.y -= enemyTypeData[enemy->type].speed;
+            break;
+        }
+        case 1:
+        {
+            enemy->position.y += enemyTypeData[enemy->type].speed;
+            break;
+        }
+        case 2:
+        {
+            enemy->position.x -= enemyTypeData[enemy->type].speed;
+            break;
+        }
+        case 3:
+        {
+            enemy->position.x += enemyTypeData[enemy->type].speed;
+            break;
+        }
+    }
+}
+
 bool updateEnemies(Enemy* enemies, uint16_t maxEnemies, Map* map, Game* game)
 {
     bool hasEnemies = false;
@@ -114,60 +171,7 @@ bool updateEnemies(Enemy* enemies, uint16_t maxEnemies, Map* map, Game* game)
 
         hasEnemies = true;
 
-        uint8_t x = enemies[i].position.x / 16;
-        uint8_t y = enemies[i].position.y / 16;
-
-        //Check all directions
-        if(enemies[i].toMove <= 0)
-        {
-            if(tileIsEnd(map, x, y))
-            {
-                game->lives -= enemies[i].health;
-                enemies[i].type = ENT_NONE;
-                continue;
-            }
-            else
-            {
-                enemies[i].direction = getTileAtPos(map, x, y) - 4;
-                //Start tile means move down!
-                if(getTileAtPos(map, x, y) == S)
-                {
-                    enemies[i].direction = 1;
-                }
-                enemies[i].toMove = 16;
-                enemies[i].posDiff = 0;
-            }
-        }
-
-        enemies[i].toMove -= enemyTypeData[enemies[i].type].speed;
-        enemies[i].posDiff += enemyTypeData[enemies[i].type].speed;
-        while(enemies[i].posDiff >= 1)
-        {
-            enemies[i].posDiff -= 1.0f;
-            switch(enemies[i].direction)
-            {
-                case 0:
-                {
-                    enemies[i].position.y--;
-                    break;
-                }
-                case 1:
-                {
-                    enemies[i].position.y++;
-                    break;
-                }
-                case 2:
-                {
-                    enemies[i].position.x--;
-                    break;
-                }
-                case 3:
-                {
-                    enemies[i].position.x++;
-                    break;
-                }
-            }
-        }
+        updateEnemy(&enemies[i], map, game);
     }
 
     return hasEnemies;

@@ -27,17 +27,15 @@ typedef struct {
     float speed;
     uint8_t moneyValue;
 
-    char* tilePath;
+    char* texturePath;
 } EnemyTypeData;
 
 typedef struct {
     EnemyType type;
 
     uint16_t health;
-    vec2i position;
+    vec2 position;
     uint8_t direction;
-    float toMove;
-    float posDiff;
 
     //Status modifiers
     bool isIced;

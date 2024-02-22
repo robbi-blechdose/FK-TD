@@ -49,11 +49,14 @@ typedef struct {
     uint16_t cooldown;
 } Tower;
 
+extern const TowerTypeData towerTypeData[NUM_TOWER_TYPES];
+
 void initTowers();
 void quitTowers();
 
-void drawTowers(SDL_Surface* screen, Tower* towers, uint16_t maxTowers);
+void drawTower(SDL_Surface* screen, TowerType tower, vec2i position);
 void drawTowerWithRange(SDL_Surface* screen, TowerType tower, vec2i position);
+void drawTowers(SDL_Surface* screen, Tower* towers, uint16_t maxTowers);
 
 bool placeTower(vec2i* cursor, Tower* towers, uint16_t maxTowers, uint8_t type, Map* map);
 void updateTowers(Tower* towers, uint16_t maxTowers, Enemy* enemies, uint16_t maxEnemies, Projectile projectiles[], uint16_t* money);

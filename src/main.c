@@ -136,11 +136,9 @@ void calcFrameGame()
     {
         if(cursorMode == CURSOR_MAP && selectedTower != TT_NONE)
         {
-            //TODO
-            //if(game.money >= towerTypes[selectedTower].cost && placeTower(&cursor, towers, selectedTower, map))
-            if(game.money >= 100 && placeTower(&cursor, towers, MAX_TOWERS, selectedTower, map))
+            if(game.money >= towerTypeData[selectedTower].cost && placeTower(&cursor, towers, MAX_TOWERS, selectedTower, map))
             {
-                game.money -= 100; //towerTypes[selectedTower].cost;
+                game.money -= towerTypeData[selectedTower].cost;
                 //TODO: Play "placed" sound
             }
             else
@@ -277,6 +275,13 @@ void drawFrame()
             drawHUD(screen, &game);
             drawCursor(screen, &cursor, cursorMode, selectedTower);
             drawEffects(screen);
+
+            char buffer[64];
+            sprintf(buffer, "Enemy 0: %f | %f", enemies[0].position.x, enemies[0].position.y);
+            stringRGBA(screen, 0, 220, buffer, 255, 255, 255, 255);
+
+            vec2i epos = {.x = enemies[0].position.x, .y = enemies[0].position.y};
+            drawCursor(screen, &epos, cursorMode, selectedTower);
             break;
         }
         case STATE_LOST:

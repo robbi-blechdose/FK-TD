@@ -25,10 +25,9 @@ void drawHUD(SDL_Surface* screen, Game* game)
 
     for(uint8_t i = 0; i < NUM_TOWER_TYPES; i++)
     {
-        SDL_Rect rect = {.x = 0, .y = 0, .w = 16, .h = 16};
-        //SDL_BlitSurface(towerTiles[i], &rect, screen, &hudElements[i].position);
+        drawTower(screen, i, (vec2i) {.x = hudElements[i].position.x, .y = hudElements[i].position.y});
         stringRGBA(screen, hudElements[i].position.x + 16, hudElements[i].position.y, hudElements[i].name, 255, 255, 255, 255);
-        //sprintf(buffer, "%d$", towerTypes[i].cost);
+        sprintf(buffer, "%d$", towerTypeData[i].cost);
         stringRGBA(screen, hudElements[i].position.x + 16, hudElements[i].position.y + 8, buffer, 255, 255, 255, 255);
     }
     //Stats
