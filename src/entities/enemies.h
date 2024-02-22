@@ -36,6 +36,7 @@ typedef struct {
     uint16_t health;
     vec2 position;
     uint8_t direction;
+    float toMove;
 
     //Status modifiers
     bool isIced;

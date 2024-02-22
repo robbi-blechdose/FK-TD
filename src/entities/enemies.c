@@ -63,6 +63,7 @@ bool addEnemy(Enemy* enemies, uint16_t maxEnemies, uint8_t x, uint8_t y, uint8_t
             enemies[i].position.x = x;
             enemies[i].position.y = y;
             enemies[i].direction = dir;
+            enemies[i].toMove = 0;
             enemies[i].health = enemyTypeData[type].health;
             enemies[i].isIced = false;
             return true;
@@ -106,51 +107,50 @@ void damageEnemy(Enemy* enemy, uint16_t damage, bool iced, uint16_t* money)
 
 void updateEnemy(Enemy* enemy, Map* map, Game* game)
 {
-    vec2i tilePosition = {.x = enemy->position.x, .y = enemy->position.y};
+    vec2i tilePosition = {.x = roundf(enemy->position.x), .y = roundf(enemy->position.y)};
 
     //TODO: move this (the effect of reaching the end tile) somewhere else?
-    if(tileIsEnd(map, tilePosition.x, tilePosition.y))
+    if(enemy->toMove <= 0 && tileIsEnd(map, tilePosition.x, tilePosition.y))
     {
         //TODO: apply health from nested enemies...
         game->lives -= enemy->health;
         enemy->type = ENT_NONE;
     }
     
-    //Direction handling
-    uint8_t previousDirection = enemy->direction;
-    enemy->direction = getTileAtPos(map, tilePosition.x, tilePosition.y) - 3;
+    if(enemy->toMove > 0)
+    {
+        enemy->toMove -= enemyTypeData[enemy->type].speed;
+        switch(enemy->direction)
+        {
+            case 0:
+            {
+                enemy->position.y -= enemyTypeData[enemy->type].speed;
+                break;
+            }
+            case 1:
+            {
+                enemy->position.y += enemyTypeData[enemy->type].speed;
+                break;
+            }
+            case 2:
+            {
+                enemy->position.x -= enemyTypeData[enemy->type].speed;
+                break;
+            }
+            case 3:
+            {
+                enemy->position.x += enemyTypeData[enemy->type].speed;
+                break;
+            }
+        }
+    }
+    else
+    {
+        //Direction handling
+        enemy->direction = getTileAtPos(map, tilePosition.x, tilePosition.y) - 3;
+        enemy->toMove = 1;
+    }
     
-    //TODO: fix this "teleporting" the enemy when going left
-    if(enemy->direction != previousDirection)
-    {
-        //Snap enemy to tile
-        enemy->position.x = tilePosition.x;
-        enemy->position.y = tilePosition.y;
-    }
-
-    switch(enemy->direction)
-    {
-        case 0:
-        {
-            enemy->position.y -= enemyTypeData[enemy->type].speed;
-            break;
-        }
-        case 1:
-        {
-            enemy->position.y += enemyTypeData[enemy->type].speed;
-            break;
-        }
-        case 2:
-        {
-            enemy->position.x -= enemyTypeData[enemy->type].speed;
-            break;
-        }
-        case 3:
-        {
-            enemy->position.x += enemyTypeData[enemy->type].speed;
-            break;
-        }
-    }
 }
 
 bool updateEnemies(Enemy* enemies, uint16_t maxEnemies, Map* map, Game* game)
