@@ -30,6 +30,11 @@ typedef struct {
     char* texturePath;
 } EnemyTypeData;
 
+#define STAT_ICED    0b00000001
+#define STAT_BURNING 0b00000010
+#define STAT_GLUED   0b00000100
+//TODO more stats...
+
 typedef struct {
     EnemyType type;
 
@@ -38,17 +43,18 @@ typedef struct {
     uint8_t direction;
     float toMove;
 
-    //Status modifiers
-    bool isIced;
+    uint8_t statModifiers;
 } Enemy;
 
 void initEnemies();
 void quitEnemies();
 
 void drawEnemies(SDL_Surface* screen, Enemy* enemies, uint16_t maxEnemies);
+bool updateEnemies(Enemy* enemies, uint16_t maxEnemies, Map* map, Game* game);
 
 bool addEnemy(Enemy* enemies, uint16_t maxEnemies, uint8_t x, uint8_t y, uint8_t dir, uint8_t type);
-void damageEnemy(Enemy* enemy, uint16_t damage, bool iced, uint16_t* money);
-bool updateEnemies(Enemy* enemies, uint16_t maxEnemies, Map* map, Game* game);
+
+void statChangeEnemy(Enemy* enemy, uint8_t stats);
+void damageEnemy(Enemy* enemy, uint16_t damage, uint16_t* money);
 
 #endif

@@ -89,7 +89,7 @@ bool updateProjectiles(Projectile projectiles[], Enemy enemies[], uint16_t* mone
                     vec2i zero = {0, 0};
                     addEffect(projectileTypes[projectiles[i].type].hitEffect, projectiles[i].position.x, projectiles[i].position.y, &zero, 0);
                 }
-                damageEnemy(&enemies[j], projectileTypes[projectiles[i].type].damage, 0, money);
+                damageEnemy(&enemies[j], projectileTypes[projectiles[i].type].damage, money);
                 projectiles[i].type = PT_NONE;
             }
         }

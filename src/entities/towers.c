@@ -109,6 +109,58 @@ bool placeTower(vec2i* cursor, Tower* towers, uint16_t maxTowers, uint8_t type, 
     return false;
 }
 
+void towerAttack(Tower* tower, Enemy* enemies, uint16_t maxEnemies, Projectile projectiles[], uint16_t* money)
+{
+    uint8_t radius = towerTypeData[tower->type].radius;
+    uint8_t displayEffect = 1;
+
+    //TODO: Fire on enemies in order (at first enemy in range!) -> maybe with an enemy index as attribute?
+    for(uint16_t j = 0; j < maxEnemies; j++)
+    {
+        if(enemies[j].type != ENT_NONE)
+        {
+            if(vec2i_distance(&enemies[j].position, &tower->position) > radius)
+            {
+                continue;
+            }
+
+            const TowerTypeData* type = &towerTypeData[tower->type];
+            uint16_t damage = type->damage;
+            tower->cooldown = type->cooldown;
+            
+            if(type->attack == A_ZAP)
+            {
+                damageEnemy(&enemies[j], damage, money);
+                addEffect(EFT_ZAP, tower->position.x * 16 + 8, tower->position.y * 16 + 8, &enemies[j].position, type->radius);
+                //ZAP can only fire at one enemy, we're done
+                break;
+            }
+            else if(type->attack == A_ICE)
+            {
+                //TODO: Slow the enemy down instead of damaging it - or maybe both?
+                damageEnemy(&enemies[j], damage, money);
+                statChangeEnemy(&enemies[j], STAT_ICED);
+                if(displayEffect)
+                {
+                    addEffect(EFT_ICE, tower->position.x * 16 + 8, tower->position.y * 16 + 8, &enemies[j].position, type->radius);
+                    //Keep going, but don't add multiple effects
+                    displayEffect = 0;
+                }
+            }
+            else if(type->attack == A_FIRE)
+            {
+                addProjectile(projectiles, tower->position.x, tower->position.y, enemies[j].position.x, enemies[j].position.y, 0);
+                break;
+            }
+            else if(type->attack == A_CANNON)
+            {
+                addProjectile(projectiles, tower->position.x, tower->position.y, enemies[j].position.x, enemies[j].position.y, 1);
+                break;
+            }
+        }
+    }
+}
+
 void updateTowers(Tower* towers, uint16_t maxTowers, Enemy* enemies, uint16_t maxEnemies, Projectile projectiles[], uint16_t* money)
 {
     for(uint16_t i = 0; i < maxTowers; i++)
@@ -124,51 +176,6 @@ void updateTowers(Tower* towers, uint16_t maxTowers, Enemy* enemies, uint16_t ma
             continue;
         }
         
-        uint8_t radius = towerTypeData[towers[i].type].radius;
-        uint16_t damage = towerTypeData[towers[i].type].damage;
-        uint8_t displayEffect = 1;
-
-        //TODO: Fire on enemies in order (at first enemy in range!) -> maybe with an enemy index as attribute?
-        for(uint16_t j = 0; j < maxEnemies; j++)
-        {
-            if(enemies[j].type != ENT_NONE)
-            {
-                if(vec2i_distance(&enemies[j].position, &towers[i].position) <= radius)
-                {
-                    const TowerTypeData* type = &towerTypeData[towers[i].type];
-
-                    towers[i].cooldown = type->cooldown;
-                    
-                    if(type->attack == A_ZAP)
-                    {
-                        damageEnemy(&enemies[j], damage, 0, money);
-                        addEffect(EFT_ZAP, towers[i].position.x * 16 + 8, towers[i].position.y * 16 + 8, &enemies[j].position, type->radius);
-                        //ZAP can only fire at one enemy, we're done
-                        break;
-                    }
-                    else if(type->attack == A_ICE)
-                    {
-                        //TODO: Slow the enemy down instead of damaging it - or maybe both?
-                        damageEnemy(&enemies[j], damage, 1, money);
-                        if(displayEffect)
-                        {
-                            addEffect(EFT_ICE, towers[i].position.x * 16 + 8, towers[i].position.y * 16 + 8, &enemies[j].position, type->radius);
-                            //Keep going, but don't add multiple effects
-                            displayEffect = 0;
-                        }
-                    }
-                    else if(type->attack == A_FIRE)
-                    {
-                        addProjectile(projectiles, towers[i].position.x, towers[i].position.y, enemies[j].position.x, enemies[j].position.y, 0);
-                        break;
-                    }
-                    else if(type->attack == A_CANNON)
-                    {
-                        addProjectile(projectiles, towers[i].position.x, towers[i].position.y, enemies[j].position.x, enemies[j].position.y, 1);
-                        break;
-                    }
-                }
-            }
-        }
+        towerAttack(&towers[i], enemies, maxEnemies, projectiles, money);
     }
 }

@@ -29,6 +29,19 @@ void quitEnemies()
     //TODO: unload stuff etc.
 }
 
+void drawEnemy(SDL_Surface* screen, Enemy* enemy, int animCounter)
+{
+    SDL_Rect rect = {.x = (animCounter / 8 % 2) * ENEMY_TEXTURE_SIZE,
+                        .y = 0,
+                        .w = ENEMY_TEXTURE_SIZE, .h = ENEMY_TEXTURE_SIZE};
+    //TODO: replace 16 with map tile size
+    //TODO: remove magic constant 1 caused by difference between enemy and map tile size
+    SDL_Rect pos = {.x = enemy->position.x * 16 + 1,
+                    .y = enemy->position.y * 16 + 1};
+    SDL_BlitSurface(enemyTextures[enemy->type], &rect, screen, &pos);
+    //TODO: apply texture on top or tint for stat effects
+}
+
 void drawEnemies(SDL_Surface* screen, Enemy* enemies, uint16_t maxEnemies)
 {
     //TODO: move somewhere else?
@@ -38,71 +51,11 @@ void drawEnemies(SDL_Surface* screen, Enemy* enemies, uint16_t maxEnemies)
     {
         if(enemies[i].type != ENT_NONE)
         {
-            SDL_Rect rect = {.x = (animCounter / 8 % 2) * ENEMY_TEXTURE_SIZE,
-                                .y = 0,
-                                .w = ENEMY_TEXTURE_SIZE, .h = ENEMY_TEXTURE_SIZE};
-            //TODO: replace 16 with map tile size
-            //TODO: remove magic constant 1 caused by difference between enemy and map tile size
-            SDL_Rect pos = {.x = enemies[i].position.x * 16 + 1,
-                            .y = enemies[i].position.y * 16 + 1};
-            SDL_BlitSurface(enemyTextures[enemies[i].type], &rect, screen, &pos);
+            drawEnemy(screen, &enemies[i], animCounter);
         }
     }
 
     animCounter++;
-}
-
-bool addEnemy(Enemy* enemies, uint16_t maxEnemies, uint8_t x, uint8_t y, uint8_t dir, uint8_t type)
-{
-    for(uint16_t i = 0; i < maxEnemies; i++)
-    {
-        if(enemies[i].type == ENT_NONE)
-        {
-            //We found a free spot, insert the enemy
-            enemies[i].type = type;
-            enemies[i].position.x = x;
-            enemies[i].position.y = y;
-            enemies[i].direction = dir;
-            enemies[i].toMove = 0;
-            enemies[i].health = enemyTypeData[type].health;
-            enemies[i].isIced = false;
-            return true;
-        }
-    }
-    return false;
-}
-
-void damageEnemy(Enemy* enemy, uint16_t damage, bool iced, uint16_t* money)
-{
-    //TODO: move stat changes somewhere else
-    enemy->isIced = iced;
-
-    if(enemy->health > damage)
-    {
-        enemy->health -= damage;
-        return;
-    }
-
-    (*money) += enemyTypeData[enemy->type].moneyValue;
-
-    if(enemyTypeData[enemy->type].containedType == ENT_NONE)
-    {
-        //This is the "smallest" enemy and health is <= damage
-        enemy->type = ENT_NONE;
-        return;
-    }
-    
-    //We have "contained" enemies
-    //Subtract damage
-    damage -= enemy->health;
-    //Replace enemy with "contained" enemy
-    enemy->type = enemyTypeData[enemy->type].containedType;
-    enemy->health = enemyTypeData[enemy->type].health;
-    //If there's still damage left, apply it to the new enemy
-    if(damage > 0)
-    {
-        damageEnemy(enemy, damage, iced, money);
-    }
 }
 
 void updateEnemy(Enemy* enemy, Map* map, Game* game)
@@ -119,27 +72,32 @@ void updateEnemy(Enemy* enemy, Map* map, Game* game)
     
     if(enemy->toMove > 0)
     {
-        enemy->toMove -= enemyTypeData[enemy->type].speed;
+        float speed = enemyTypeData[enemy->type].speed;
+        if(enemy->statModifiers & STAT_ICED || enemy->statModifiers & STAT_GLUED)
+        {
+            speed *= 0.7f; //TODO: replace magic value with defined constant
+        }
+        enemy->toMove -= speed;
         switch(enemy->direction)
         {
             case 0:
             {
-                enemy->position.y -= enemyTypeData[enemy->type].speed;
+                enemy->position.y -= speed;
                 break;
             }
             case 1:
             {
-                enemy->position.y += enemyTypeData[enemy->type].speed;
+                enemy->position.y += speed;
                 break;
             }
             case 2:
             {
-                enemy->position.x -= enemyTypeData[enemy->type].speed;
+                enemy->position.x -= speed;
                 break;
             }
             case 3:
             {
-                enemy->position.x += enemyTypeData[enemy->type].speed;
+                enemy->position.x += speed;
                 break;
             }
         }
@@ -170,4 +128,60 @@ bool updateEnemies(Enemy* enemies, uint16_t maxEnemies, Map* map, Game* game)
     }
 
     return hasEnemies;
+}
+
+bool addEnemy(Enemy* enemies, uint16_t maxEnemies, uint8_t x, uint8_t y, uint8_t dir, uint8_t type)
+{
+    for(uint16_t i = 0; i < maxEnemies; i++)
+    {
+        if(enemies[i].type == ENT_NONE)
+        {
+            //We found a free spot, insert the enemy
+            enemies[i].type = type;
+            enemies[i].position.x = x;
+            enemies[i].position.y = y;
+            enemies[i].direction = dir;
+            enemies[i].toMove = 0;
+            enemies[i].health = enemyTypeData[type].health;
+            enemies[i].statModifiers = 0;
+            return true;
+        }
+    }
+    return false;
+}
+
+void statChangeEnemy(Enemy* enemy, uint8_t stats)
+{
+    enemy->statModifiers ^= stats;
+}
+
+void damageEnemy(Enemy* enemy, uint16_t damage, uint16_t* money)
+{
+
+    if(enemy->health > damage)
+    {
+        enemy->health -= damage;
+        return;
+    }
+
+    (*money) += enemyTypeData[enemy->type].moneyValue;
+
+    if(enemyTypeData[enemy->type].containedType == ENT_NONE)
+    {
+        //This is the "smallest" enemy and health is <= damage
+        enemy->type = ENT_NONE;
+        return;
+    }
+    
+    //We have "contained" enemies
+    //Subtract damage
+    damage -= enemy->health;
+    //Replace enemy with "contained" enemy
+    enemy->type = enemyTypeData[enemy->type].containedType;
+    enemy->health = enemyTypeData[enemy->type].health;
+    //If there's still damage left, apply it to the new enemy
+    if(damage > 0)
+    {
+        damageEnemy(enemy, damage, money);
+    }
 }
