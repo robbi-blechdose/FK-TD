@@ -21,6 +21,8 @@ typedef enum {
     ENT_NONE
 } EnemyType;
 
+//TODO: resistance to tower types
+
 typedef struct {
     EnemyType containedType;
     float health;

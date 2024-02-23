@@ -10,15 +10,6 @@
 #include "enemies.h"
 #include "projectiles.h"
 
-//TODO: do we need this? seems redundant
-typedef enum {
-    A_NONE,
-    A_ZAP,
-    A_ICE,
-    A_FIRE,
-    A_CANNON
-} AttackType;
-
 typedef enum {
     TT_ZAP,
     TT_ICE,
@@ -28,14 +19,14 @@ typedef enum {
     TT_NONE
 } TowerType;
 
+//TODO: add possibility for "firing" and "ready" frames along with idle frames
+
 typedef struct {
     const char* name;
 
     char* texturePath;
     uint8_t numFrames;
 
-    //TODO: do we need this? seems redundant
-    AttackType attack;
     uint16_t cooldown;
     uint16_t damage;
     uint8_t radius;

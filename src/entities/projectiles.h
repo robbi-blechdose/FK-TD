@@ -25,9 +25,9 @@ typedef struct {
 typedef struct {
     uint8_t type;
     uint8_t timer;
-    vec2i position;
-    vec2i source;
-    vec2i target;
+    vec2 position;
+    vec2 source;
+    vec2 target;
 } Projectile;
 
 void initProjectiles();

@@ -1,5 +1,7 @@
 #include "enemies.h"
 
+#include <math.h>
+
 #include "../utils.h"
 
 //In pixels
@@ -7,11 +9,11 @@
 
 const EnemyTypeData enemyTypeData[NUM_ENEMY_TYPES] = {
     [ENT_RED] =    {.containedType = ENT_NONE,   .health = 1, .speed = 0.8f / 16, .moneyValue = 1, .texturePath = "res/enemies/Enemy_0.png"},
-    [ENT_BLUE] =   {.containedType = ENT_RED,    .health = 1, .speed = 1.0f / 16, .moneyValue = 1, .texturePath = "res/enemies/Enemy_1.png"},
-    [ENT_GREEN] =  {.containedType = ENT_BLUE,   .health = 1, .speed = 1.2f / 16, .moneyValue = 1, .texturePath = "res/enemies/Enemy_2.png"},
-    [ENT_YELLOW] = {.containedType = ENT_GREEN,  .health = 1, .speed = 1.5f / 16, .moneyValue = 1, .texturePath = "res/enemies/Enemy_3.png"},
-    [ENT_VIOLET] = {.containedType = ENT_YELLOW, .health = 1, .speed = 2.0f / 16, .moneyValue = 1, .texturePath = "res/enemies/Enemy_4.png"},
-    [ENT_SHIP] =   {.containedType = ENT_VIOLET, .health = 2, .speed = 2.5f / 16, .moneyValue = 2, .texturePath = "res/enemies/Enemy_5.png"}
+    [ENT_BLUE] =   {.containedType = ENT_RED,    .health = 1, .speed = 0.8f / 16, .moneyValue = 1, .texturePath = "res/enemies/Enemy_1.png"},
+    [ENT_GREEN] =  {.containedType = ENT_BLUE,   .health = 1, .speed = 0.8f / 16, .moneyValue = 1, .texturePath = "res/enemies/Enemy_2.png"},
+    [ENT_YELLOW] = {.containedType = ENT_GREEN,  .health = 1, .speed = 1.0f / 16, .moneyValue = 1, .texturePath = "res/enemies/Enemy_3.png"},
+    [ENT_VIOLET] = {.containedType = ENT_YELLOW, .health = 1, .speed = 1.0f / 16, .moneyValue = 1, .texturePath = "res/enemies/Enemy_4.png"},
+    [ENT_SHIP] =   {.containedType = ENT_VIOLET, .health = 2, .speed = 1.5f / 16, .moneyValue = 2, .texturePath = "res/enemies/Enemy_5.png"}
 };
 
 SDL_Surface* enemyTextures[NUM_ENEMY_TYPES];
@@ -44,8 +46,8 @@ void drawEnemy(SDL_Surface* screen, Enemy* enemy, int animCounter)
 
 void drawEnemies(SDL_Surface* screen, Enemy* enemies, uint16_t maxEnemies)
 {
-    //TODO: move somewhere else?
-    static int animCounter = 0;
+    static uint8_t animCounter = 0;
+    animCounter++;
 
     for(uint16_t i = 0; i < maxEnemies; i++)
     {
@@ -54,8 +56,6 @@ void drawEnemies(SDL_Surface* screen, Enemy* enemies, uint16_t maxEnemies)
             drawEnemy(screen, &enemies[i], animCounter);
         }
     }
-
-    animCounter++;
 }
 
 void updateEnemy(Enemy* enemy, Map* map, Game* game)
@@ -77,6 +77,13 @@ void updateEnemy(Enemy* enemy, Map* map, Game* game)
         {
             speed *= 0.7f; //TODO: replace magic value with defined constant
         }
+
+        //Make sure we don't overshoot
+        if(speed > enemy->toMove)
+        {
+            speed = enemy->toMove;
+        }
+        
         enemy->toMove -= speed;
         switch(enemy->direction)
         {

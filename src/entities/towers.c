@@ -6,10 +6,10 @@
 #define TOWER_TEXTURE_SIZE 16
 
 const TowerTypeData towerTypeData[NUM_TOWER_TYPES] = {
-    {.name = "Zap", .attack = A_ZAP,    .cost = 35, .cooldown = 50, .damage = 1, .radius = 2, .texturePath = "res/towers/zap_tower.png", .numFrames = 2},
-    {.name = "Ice", .attack = A_ICE,    .cost = 50, .cooldown = 75, .damage = 0, .radius = 2, .texturePath = "res/towers/ice_tower.png", .numFrames = 2},
-    {.name = "Fireball", .attack = A_FIRE,   .cost = 70, .cooldown = 20, .damage = 1, .radius = 3, .texturePath = "res/towers/fire_tower.png", .numFrames = 2},
-    {.name = "Cannon", .attack = A_CANNON, .cost = 55, .cooldown = 60, .damage = 8, .radius = 4, .texturePath = "res/towers/cannon_tower.png", .numFrames = 2}
+    {.name = "Zap",      .cost = 35, .cooldown = 50, .damage = 1, .radius = 2, .texturePath = "res/towers/zap_tower.png", .numFrames = 2},
+    {.name = "Ice",      .cost = 50, .cooldown = 75, .damage = 0, .radius = 2, .texturePath = "res/towers/ice_tower.png", .numFrames = 2},
+    {.name = "Fireball", .cost = 70, .cooldown = 20, .damage = 1, .radius = 3, .texturePath = "res/towers/fire_tower.png", .numFrames = 2},
+    {.name = "Cannon",   .cost = 55, .cooldown = 60, .damage = 8, .radius = 4, .texturePath = "res/towers/cannon_tower.png", .numFrames = 2}
 };
 
 SDL_Surface* towerTextures[NUM_TOWER_TYPES];
@@ -45,8 +45,8 @@ void drawTowerWithRange(SDL_Surface* screen, TowerType tower, vec2i position)
 //TODO: switch to using drawTower
 void drawTowers(SDL_Surface* screen, Tower* towers, uint16_t maxTowers)
 {
-    //TODO
-    int animCounter = 0;
+    static uint8_t animCounter = 0;
+    animCounter++;
 
     for(uint16_t i = 0; i < maxTowers; i++)
     {
@@ -119,42 +119,45 @@ void towerAttack(Tower* tower, Enemy* enemies, uint16_t maxEnemies, Projectile p
     {
         if(enemies[j].type != ENT_NONE)
         {
-            if(vec2i_distance(&enemies[j].position, &tower->position) > radius)
+            vec2i enemyPosition = (vec2i) {.x = enemies[j].position.x, .y = enemies[j].position.y};
+            if(vec2i_distance(&enemyPosition, &tower->position) > radius)
             {
                 continue;
             }
 
-            const TowerTypeData* type = &towerTypeData[tower->type];
-            uint16_t damage = type->damage;
-            tower->cooldown = type->cooldown;
+            uint16_t damage = towerTypeData[tower->type].damage;
+            tower->cooldown = towerTypeData[tower->type].cooldown;
             
-            if(type->attack == A_ZAP)
+            //TODO: make this prettier (avoid the position conversions somehow or add a function forthem)
+            if(tower->type == TT_ZAP)
             {
                 damageEnemy(&enemies[j], damage, money);
-                addEffect(EFT_ZAP, tower->position.x * 16 + 8, tower->position.y * 16 + 8, &enemies[j].position, type->radius);
+                vec2i enemyPixelCenter = (vec2i) {.x = enemies[j].position.x * 16 + 8, .y = enemies[j].position.y * 16 + 8};
+                addEffect(EFT_ZAP, tower->position.x * 16 + 8, tower->position.y * 16 + 8, &enemyPixelCenter, towerTypeData[tower->type].radius);
                 //ZAP can only fire at one enemy, we're done
                 break;
             }
-            else if(type->attack == A_ICE)
+            else if(tower->type == TT_ICE)
             {
                 //TODO: Slow the enemy down instead of damaging it - or maybe both?
                 damageEnemy(&enemies[j], damage, money);
                 statChangeEnemy(&enemies[j], STAT_ICED);
                 if(displayEffect)
                 {
-                    addEffect(EFT_ICE, tower->position.x * 16 + 8, tower->position.y * 16 + 8, &enemies[j].position, type->radius);
+                    vec2i enemyPixelCenter = (vec2i) {.x = enemies[j].position.x * 16 + 8, .y = enemies[j].position.y * 16 + 8};
+                    addEffect(EFT_ICE, tower->position.x * 16 + 8, tower->position.y * 16 + 8, &enemyPixelCenter, towerTypeData[tower->type].radius);
                     //Keep going, but don't add multiple effects
                     displayEffect = 0;
                 }
             }
-            else if(type->attack == A_FIRE)
+            else if(tower->type == TT_FIREBALL)
             {
-                addProjectile(projectiles, tower->position.x, tower->position.y, enemies[j].position.x, enemies[j].position.y, 0);
+                addProjectile(projectiles, tower->position.x, tower->position.y, enemyPosition.x, enemyPosition.y, 0);
                 break;
             }
-            else if(type->attack == A_CANNON)
+            else if(tower->type == TT_CANNON)
             {
-                addProjectile(projectiles, tower->position.x, tower->position.y, enemies[j].position.x, enemies[j].position.y, 1);
+                addProjectile(projectiles, tower->position.x, tower->position.y, enemyPosition.x, enemyPosition.y, 1);
                 break;
             }
         }

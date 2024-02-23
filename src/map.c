@@ -47,8 +47,8 @@ bool tileIsReserved(Map* map, uint8_t x, uint8_t y)
 
 void drawMap(SDL_Surface* screen, Map* map)
 {
-    //TODO
-    int animCounter = 0;
+    static uint8_t animCounter = 0;
+    animCounter++;
 
     for(uint8_t i = 0; i < MAP_WIDTH; i++)
     {
@@ -68,6 +68,4 @@ void drawMap(SDL_Surface* screen, Map* map)
             }
         }
     }
-
-    animCounter++;
 }

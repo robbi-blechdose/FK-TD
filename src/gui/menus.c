@@ -4,13 +4,13 @@
 #include <SDL_gfxPrimitives.h>
 
 #include "../utils.h"
+#include "../version.h"
 
 SDL_Surface* titleScreen;
 SDL_Surface* loseScreen;
 
 void initMenus()
 {
-
     titleScreen = loadPNG("res/screens/title_screen.png");
     loseScreen = loadPNG("res/screens/game_over.png");
 }
@@ -27,9 +27,10 @@ void drawMenu(SDL_Surface* screen)
 
     SDL_Rect pos = {.x = 0, .y = 0};
     SDL_BlitSurface(titleScreen, NULL, screen, &pos);
+    stringRGBA(screen, CENTER(strlen(GAME_VERSION)), 132, GAME_VERSION, 255, 255, 255, 255);
     if(menuTimer < 128)
     {
-        stringRGBA(screen, CENTER(11), 148, "PRESS START", 255, 255, 255, 255);
+        stringRGBA(screen, CENTER(11), 156, "PRESS START", 255, 255, 255, 255);
     }
     stringRGBA(screen, CENTER(8), 200, "2021 - 2024", 255, 255, 255, 255);
     stringRGBA(screen, CENTER(15), 208, "Robbi Blechdose", 255, 255, 0, 255);

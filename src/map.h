@@ -8,8 +8,6 @@
 #include "engine/math.h"
 
 #define NUM_RENDER_TILES 13
-//TODO: remove start tile, replace with position in map struct
-//that would allow arbitrary starting directions instead of only down
 typedef enum {
     G, W,
     U, D, L, R,
