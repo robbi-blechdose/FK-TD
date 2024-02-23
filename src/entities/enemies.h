@@ -56,7 +56,7 @@ bool updateEnemies(Enemy* enemies, uint16_t maxEnemies, Map* map, Game* game);
 
 bool addEnemy(Enemy* enemies, uint16_t maxEnemies, uint8_t x, uint8_t y, uint8_t dir, uint8_t type);
 
-void statChangeEnemy(Enemy* enemy, uint8_t stats);
+void addStatToEnemy(Enemy* enemy, uint8_t stats);
 void damageEnemy(Enemy* enemy, uint16_t damage, uint16_t* money);
 
 #endif

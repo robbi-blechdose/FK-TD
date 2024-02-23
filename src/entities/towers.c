@@ -139,9 +139,8 @@ void towerAttack(Tower* tower, Enemy* enemies, uint16_t maxEnemies, Projectile p
             }
             else if(tower->type == TT_ICE)
             {
-                //TODO: Slow the enemy down instead of damaging it - or maybe both?
                 damageEnemy(&enemies[j], damage, money);
-                statChangeEnemy(&enemies[j], STAT_ICED);
+                addStatToEnemy(&enemies[j], STAT_ICED);
                 if(displayEffect)
                 {
                     vec2i enemyPixelCenter = (vec2i) {.x = enemies[j].position.x * 16 + 8, .y = enemies[j].position.y * 16 + 8};

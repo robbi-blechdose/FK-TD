@@ -4,8 +4,10 @@
 
 #include "../utils.h"
 
+//TODO: replace with texture size in enemytypedata (to allow for bigger enemies)
+//TODO: also rename it then since this is the frame size, not the total texture size
 //In pixels
-#define ENEMY_TEXTURE_SIZE 14
+#define ENEMY_TEXTURE_SIZE 16
 
 const EnemyTypeData enemyTypeData[NUM_ENEMY_TYPES] = {
     [ENT_RED] =    {.containedType = ENT_NONE,   .health = 1, .speed = 0.8f / 16, .moneyValue = 1, .texturePath = "res/enemies/Enemy_0.png"},
@@ -37,11 +39,14 @@ void drawEnemy(SDL_Surface* screen, Enemy* enemy, int animCounter)
                         .y = 0,
                         .w = ENEMY_TEXTURE_SIZE, .h = ENEMY_TEXTURE_SIZE};
     //TODO: replace 16 with map tile size
-    //TODO: remove magic constant 1 caused by difference between enemy and map tile size
-    SDL_Rect pos = {.x = enemy->position.x * 16 + 1,
-                    .y = enemy->position.y * 16 + 1};
+    SDL_Rect pos = {.x = enemy->position.x * 16,
+                    .y = enemy->position.y * 16};
     SDL_BlitSurface(enemyTextures[enemy->type], &rect, screen, &pos);
-    //TODO: apply texture on top or tint for stat effects
+    if(enemy->statModifiers & STAT_ICED)
+    {
+        rect.y = 16;
+        SDL_BlitSurface(enemyTextures[enemy->type], &rect, screen, &pos);
+    }
 }
 
 void drawEnemies(SDL_Surface* screen, Enemy* enemies, uint16_t maxEnemies)
@@ -157,9 +162,9 @@ bool addEnemy(Enemy* enemies, uint16_t maxEnemies, uint8_t x, uint8_t y, uint8_t
     return false;
 }
 
-void statChangeEnemy(Enemy* enemy, uint8_t stats)
+void addStatToEnemy(Enemy* enemy, uint8_t stats)
 {
-    enemy->statModifiers ^= stats;
+    enemy->statModifiers |= stats;
 }
 
 void damageEnemy(Enemy* enemy, uint16_t damage, uint16_t* money)
