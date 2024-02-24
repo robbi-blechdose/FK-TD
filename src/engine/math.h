@@ -17,7 +17,9 @@ typedef struct {
 void vec2i_copy(vec2i* dst, vec2i* src);
 uint8_t vec2i_distance(vec2i* va, vec2i* vb);
 bool vec2i_withinRadius(vec2i* va, vec2i* vb, uint8_t radius);
+bool vec2_withinRadius(vec2 va, vec2 vb, float radius);
 
 uint8_t lerp(uint8_t a, uint8_t b, float f);
+float lerpf(float a, float b, float f);
 
 #endif

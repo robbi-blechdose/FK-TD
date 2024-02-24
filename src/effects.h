@@ -24,7 +24,7 @@ typedef struct {
 void initEffects();
 void quitEffects();
 
-void addEffect(EffectType type, uint8_t x, uint8_t y, vec2i* enemy, uint8_t radius);
+void addEffect(EffectType type, vec2 position, vec2 enemy, uint8_t radius);
 void drawEffects(SDL_Surface* screen);
 
 #endif

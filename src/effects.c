@@ -20,7 +20,7 @@ void quitEffects()
     //TODO
 }
 
-void addEffect(EffectType type, uint8_t x, uint8_t y, vec2i* enemy, uint8_t radius)
+void addEffect(EffectType type, vec2 position, vec2 enemyPosition, uint8_t radius)
 {
     for(uint8_t i = 0; i < 255; i++)
     {
@@ -29,10 +29,10 @@ void addEffect(EffectType type, uint8_t x, uint8_t y, vec2i* enemy, uint8_t radi
             effects[i].type = type;
             effects[i].timer = effectTimers[type];
             effects[i].radius = radius * 16;
-            effects[i].a.x = x;
-            effects[i].a.y = y;
-            effects[i].b.x = enemy->x;
-            effects[i].b.y = enemy->y;
+            effects[i].a.x = position.x * 16;
+            effects[i].a.y = position.y * 16;
+            effects[i].b.x = enemyPosition.x * 16;
+            effects[i].b.y = enemyPosition.y * 16;
             effects[i].middle.x = effects[i].a.x + (effects[i].b.x - effects[i].a.x) / 2;
             effects[i].middle.y = effects[i].a.y + (effects[i].b.y - effects[i].a.y) / 2;
             break;

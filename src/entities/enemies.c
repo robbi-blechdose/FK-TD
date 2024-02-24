@@ -169,7 +169,6 @@ void addStatToEnemy(Enemy* enemy, uint8_t stats)
 
 void damageEnemy(Enemy* enemy, uint16_t damage, uint16_t* money)
 {
-
     if(enemy->health > damage)
     {
         enemy->health -= damage;

@@ -187,10 +187,10 @@ void calcFrameGame()
     if(game.waveActive)
     {
         //Update
-        updateTowers(towers, MAX_TOWERS, enemies, MAX_ENEMIES, projectiles, &game.money);
+        updateTowers(towers, MAX_TOWERS, enemies, MAX_ENEMIES, projectiles, MAX_PROJECTILES, &game.money);
         bool hasEnemies = updateEnemies(enemies, MAX_ENEMIES, map, &game);
         bool hasWave = updateWaveGenerator(enemies, MAX_ENEMIES, game.wave);
-        bool hasProjectiles = updateProjectiles(projectiles, enemies, &game.money);
+        bool hasProjectiles = updateProjectiles(projectiles, MAX_PROJECTILES, enemies, MAX_ENEMIES, &game.money);
         game.waveActive = hasEnemies || hasWave || hasProjectiles;
     }
 
@@ -271,7 +271,7 @@ void drawFrame()
             drawMap(screen, map);
             drawTowers(screen, towers, MAX_TOWERS);
             drawEnemies(screen, enemies, MAX_ENEMIES);
-            drawProjectiles(screen, projectiles);
+            drawProjectiles(screen, projectiles, MAX_PROJECTILES);
             drawHUD(screen, &game);
             drawCursor(screen, &cursor, cursorMode, selectedTower);
             drawEffects(screen);

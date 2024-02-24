@@ -109,7 +109,7 @@ bool placeTower(vec2i* cursor, Tower* towers, uint16_t maxTowers, uint8_t type, 
     return false;
 }
 
-void towerAttack(Tower* tower, Enemy* enemies, uint16_t maxEnemies, Projectile projectiles[], uint16_t* money)
+void towerAttack(Tower* tower, Enemy* enemies, uint16_t maxEnemies, Projectile* projectiles, uint16_t maxProjectiles, uint16_t* money)
 {
     uint8_t radius = towerTypeData[tower->type].radius;
     uint8_t displayEffect = 1;
@@ -132,8 +132,9 @@ void towerAttack(Tower* tower, Enemy* enemies, uint16_t maxEnemies, Projectile p
             if(tower->type == TT_ZAP)
             {
                 damageEnemy(&enemies[j], damage, money);
-                vec2i enemyPixelCenter = (vec2i) {.x = enemies[j].position.x * 16 + 8, .y = enemies[j].position.y * 16 + 8};
-                addEffect(EFT_ZAP, tower->position.x * 16 + 8, tower->position.y * 16 + 8, &enemyPixelCenter, towerTypeData[tower->type].radius);
+                vec2 towerCenter = (vec2) {.x = tower->position.x + 0.5f, .y = tower->position.y + 0.5f};
+                vec2 enemyCenter = (vec2) {.x = enemies[j].position.x + 0.5f, .y = enemies[j].position.y + 0.5f};
+                addEffect(EFT_ZAP, towerCenter, enemyCenter, towerTypeData[tower->type].radius);
                 //ZAP can only fire at one enemy, we're done
                 break;
             }
@@ -143,27 +144,30 @@ void towerAttack(Tower* tower, Enemy* enemies, uint16_t maxEnemies, Projectile p
                 addStatToEnemy(&enemies[j], STAT_ICED);
                 if(displayEffect)
                 {
-                    vec2i enemyPixelCenter = (vec2i) {.x = enemies[j].position.x * 16 + 8, .y = enemies[j].position.y * 16 + 8};
-                    addEffect(EFT_ICE, tower->position.x * 16 + 8, tower->position.y * 16 + 8, &enemyPixelCenter, towerTypeData[tower->type].radius);
+                    vec2 towerCenter = (vec2) {.x = tower->position.x + 0.5f, .y = tower->position.y + 0.5f};
+                    vec2 enemyCenter = (vec2) {.x = enemies[j].position.x + 0.5f, .y = enemies[j].position.y + 0.5f};
+                    addEffect(EFT_ICE, towerCenter, enemyCenter, towerTypeData[tower->type].radius);
                     //Keep going, but don't add multiple effects
                     displayEffect = 0;
                 }
             }
             else if(tower->type == TT_FIREBALL)
             {
-                addProjectile(projectiles, tower->position.x, tower->position.y, enemyPosition.x, enemyPosition.y, 0);
+                vec2 towerPosition = (vec2) {.x = tower->position.x, tower->position.y};
+                addProjectile(projectiles, maxProjectiles, towerPosition, enemies[j].position, PT_FIREBALL);
                 break;
             }
             else if(tower->type == TT_CANNON)
             {
-                addProjectile(projectiles, tower->position.x, tower->position.y, enemyPosition.x, enemyPosition.y, 1);
+                vec2 towerPosition = (vec2) {.x = tower->position.x, .y = tower->position.y};
+                addProjectile(projectiles, maxProjectiles, towerPosition, enemies[j].position, PT_CANNONBALL);
                 break;
             }
         }
     }
 }
 
-void updateTowers(Tower* towers, uint16_t maxTowers, Enemy* enemies, uint16_t maxEnemies, Projectile projectiles[], uint16_t* money)
+void updateTowers(Tower* towers, uint16_t maxTowers, Enemy* enemies, uint16_t maxEnemies, Projectile* projectiles, uint16_t maxProjectiles, uint16_t* money)
 {
     for(uint16_t i = 0; i < maxTowers; i++)
     {
@@ -178,6 +182,6 @@ void updateTowers(Tower* towers, uint16_t maxTowers, Enemy* enemies, uint16_t ma
             continue;
         }
         
-        towerAttack(&towers[i], enemies, maxEnemies, projectiles, money);
+        towerAttack(&towers[i], enemies, maxEnemies, projectiles, maxProjectiles, money);
     }
 }

@@ -23,7 +23,7 @@ typedef struct {
 } ProjectileTypeData;
 
 typedef struct {
-    uint8_t type;
+    ProjectileType type;
     uint8_t timer;
     vec2 position;
     vec2 source;
@@ -33,9 +33,9 @@ typedef struct {
 void initProjectiles();
 void quitProjectiles();
 
-void drawProjectiles(SDL_Surface* screen, Projectile projectiles[]);
+void drawProjectiles(SDL_Surface* screen, Projectile* projectiles, uint16_t maxProjectiles);
 
-bool addProjectile(Projectile projectiles[], uint8_t x, uint8_t y, uint8_t tx, uint8_t ty, uint8_t type);
-bool updateProjectiles(Projectile projectiles[], Enemy enemies[], uint16_t* money);
+bool addProjectile(Projectile* projectiles, uint16_t maxProjectiles, vec2 sourcePos, vec2 targetPos, ProjectileType type);
+bool updateProjectiles(Projectile* projectiles, uint16_t maxProjectiles, Enemy* enemies, uint16_t maxEnemies, uint16_t* money);
 
 #endif
