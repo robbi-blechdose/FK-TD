@@ -82,8 +82,14 @@ bool updateProjectiles(Projectile* projectiles, uint16_t maxProjectiles, Enemy* 
             projectiles[i].type = PT_NONE;
         }
 
+        bool hit = false;
         for(uint16_t j = 0; j < maxEnemies; j++)
         {
+            if(enemies[j].type == ENT_NONE)
+            {
+                continue;
+            }
+
             if(vec2_withinRadius(enemies[j].position, projectiles[i].position, projectileTypes[projectiles[i].type].radius))
             {
                 if(projectileTypes[projectiles[i].type].hitEffect != EFT_NONE)
@@ -91,8 +97,12 @@ bool updateProjectiles(Projectile* projectiles, uint16_t maxProjectiles, Enemy* 
                     addEffect(projectileTypes[projectiles[i].type].hitEffect, projectiles[i].position, (vec2) {0, 0}, 0);
                 }
                 damageEnemy(&enemies[j], projectileTypes[projectiles[i].type].damage, money);
-                projectiles[i].type = PT_NONE;
+                hit = true;
             }
+        }
+        if(hit)
+        {
+            projectiles[i].type = PT_NONE;
         }
     }
 
