@@ -75,9 +75,14 @@ void updateEnemy(Enemy* enemy, const Map* map, Game* game)
     if(enemy->toMove > 0)
     {
         float speed = enemyTypeData[enemy->type].speed;
-        if(enemy->statModifiers & STAT_ICED || enemy->statModifiers & STAT_GLUED)
+        if(enemy->statModifiers & STAT_ICED)
         {
             speed *= 0.7f; //TODO: replace magic value with defined constant
+        }
+        if(enemy->statModifiers & STAT_STUNNED)
+        {
+            speed = 0;
+            enemy->stunTimer--;
         }
 
         //Make sure we don't overshoot
@@ -87,6 +92,7 @@ void updateEnemy(Enemy* enemy, const Map* map, Game* game)
         }
         
         enemy->toMove -= speed;
+        enemy->totalDistance += speed;
         switch(enemy->direction)
         {
             case 0:
@@ -151,6 +157,7 @@ bool addEnemy(Enemy* enemies, uint16_t maxEnemies, uint8_t x, uint8_t y, uint8_t
             enemies[i].position.y = y;
             enemies[i].direction = dir;
             enemies[i].toMove = 0;
+            enemies[i].totalDistance = 0;
             enemies[i].health = enemyTypeData[type].health;
             enemies[i].statModifiers = 0;
             return true;
@@ -162,6 +169,10 @@ bool addEnemy(Enemy* enemies, uint16_t maxEnemies, uint8_t x, uint8_t y, uint8_t
 void addStatToEnemy(Enemy* enemy, uint8_t stats)
 {
     enemy->statModifiers |= stats;
+    if(stats & STAT_STUNNED)
+    {
+        enemy->stunTimer = 10; //TODO: replace magic number with defined constant
+    }
 }
 
 void damageEnemy(Enemy* enemy, uint16_t damage, uint16_t* money)

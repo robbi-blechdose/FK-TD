@@ -29,7 +29,7 @@ typedef struct {
 
     uint16_t cooldown;
     uint16_t damage;
-    uint8_t radius;
+    float radius;
 
     uint16_t cost;
 } TowerTypeData;

@@ -18,9 +18,14 @@ bool vec2i_withinRadius(vec2i* va, vec2i* vb, uint8_t radius)
     return vec2i_distance(va, vb) < radius;
 }
 
+float vec2_distance(vec2 va, vec2 vb)
+{
+    return sqrtf(powf(va.x - vb.x, 2) + powf(va.y - vb.y, 2));
+}
+
 bool vec2_withinRadius(vec2 va, vec2 vb, float radius)
 {
-    return sqrtf(powf(va.x - vb.x, 2) + powf(va.y - vb.y, 2)) < radius;
+    return vec2_distance(va, vb) < radius;
 }
 
 uint8_t lerp(uint8_t a, uint8_t b, float f)

@@ -109,59 +109,114 @@ bool placeTower(vec2i* cursor, Tower* towers, uint16_t maxTowers, uint8_t type, 
     return false;
 }
 
+Enemy* getFirstEnemy(Enemy* enemies, uint16_t maxEnemies, vec2 towerCenter, float towerRadius)
+{
+    uint16_t index = 0;
+    float maxTotalDistance = 0;
+
+    for(uint16_t i = 0; i < maxEnemies; i++)
+    {
+        if(enemies[i].type == ENT_NONE)
+        {
+            continue;
+        }
+
+        vec2 enemyCenter = (vec2) {.x = enemies[i].position.x + 0.5f, .y = enemies[i].position.y + 0.5f};
+        if(vec2_distance(enemyCenter, towerCenter) > towerRadius)
+        {
+            continue;
+        }
+
+        if(enemies[i].totalDistance > maxTotalDistance)
+        {
+            maxTotalDistance = enemies[i].totalDistance;
+            index = i;
+        }
+    }
+
+    if(maxTotalDistance > 0)
+    {
+        return &enemies[index];
+    }
+    return NULL;
+}
+
 void towerAttack(Tower* tower, Enemy* enemies, uint16_t maxEnemies, Projectile* projectiles, uint16_t maxProjectiles, uint16_t* money)
 {
-    uint8_t radius = towerTypeData[tower->type].radius;
-    bool displayEffect = true;
+    bool fired = false;
 
-    //TODO: Fire on enemies in order (at first enemy in range!) -> maybe with an enemy index as attribute?
-    for(uint16_t j = 0; j < maxEnemies; j++)
+    vec2 towerCenter = (vec2) {.x = tower->position.x + 0.5f, .y = tower->position.y + 0.5f};
+    
+    switch(tower->type)
     {
-        if(enemies[j].type == ENT_NONE)
+        case TT_ZAP:
         {
-            continue;
-        }
+            Enemy* firstEnemy = getFirstEnemy(enemies, maxEnemies, towerCenter, towerTypeData[tower->type].radius);
 
-        vec2i enemyPosition = (vec2i) {.x = enemies[j].position.x, .y = enemies[j].position.y};
-        if(vec2i_distance(&enemyPosition, &tower->position) > radius)
-        {
-            continue;
-        }
-
-        uint16_t damage = towerTypeData[tower->type].damage;
-        tower->cooldown = towerTypeData[tower->type].cooldown;
-
-        vec2 towerCenter = (vec2) {.x = tower->position.x + 0.5f, .y = tower->position.y + 0.5f};
-        vec2 enemyCenter = (vec2) {.x = enemies[j].position.x + 0.5f, .y = enemies[j].position.y + 0.5f};
-        
-        if(tower->type == TT_ZAP)
-        {
-            damageEnemy(&enemies[j], damage, money);
-            addEffect(EFT_ZAP, towerCenter, enemyCenter, towerTypeData[tower->type].radius);
-            //ZAP can only fire at one enemy, we're done
-            break;
-        }
-        else if(tower->type == TT_ICE)
-        {
-            damageEnemy(&enemies[j], damage, money);
-            addStatToEnemy(&enemies[j], STAT_ICED);
-            if(displayEffect)
+            if(firstEnemy != NULL)
             {
-                addEffect(EFT_ICE, towerCenter, enemyCenter, towerTypeData[tower->type].radius);
-                //Keep going, but don't add multiple effects
-                displayEffect = false;
+                vec2 enemyCenter = (vec2) {.x = firstEnemy->position.x + 0.5f, .y = firstEnemy->position.y + 0.5f};
+                damageEnemy(firstEnemy, towerTypeData[tower->type].damage, money);
+                addEffect(EFT_ZAP, towerCenter, enemyCenter, towerTypeData[tower->type].radius);
+                fired = true;
             }
-        }
-        else if(tower->type == TT_FIREBALL)
-        {
-            addProjectile(projectiles, maxProjectiles, towerCenter, enemyCenter, PT_FIREBALL);
             break;
         }
-        else if(tower->type == TT_CANNON)
+        case TT_ICE:
         {
-            addProjectile(projectiles, maxProjectiles, towerCenter, enemyCenter, PT_CANNONBALL);
+            for(uint16_t i = 0; i < maxEnemies; i++)
+            {
+                if(enemies[i].type == ENT_NONE)
+                {
+                    continue;
+                }
+
+                vec2 enemyCenter = (vec2) {.x = enemies[i].position.x + 0.5f, .y = enemies[i].position.y + 0.5f};
+                if(vec2_distance(enemyCenter, towerCenter) > towerTypeData[tower->type].radius)
+                {
+                    continue;
+                }
+
+                damageEnemy(&enemies[i], towerTypeData[tower->type].damage, money);
+                addStatToEnemy(&enemies[i], STAT_ICED);
+                if(!fired)
+                {
+                    addEffect(EFT_ICE, towerCenter, enemyCenter, towerTypeData[tower->type].radius);
+                    //Keep going, but don't add multiple effects
+                    fired = true;
+                }
+            }
             break;
         }
+        case TT_FIREBALL:
+        {
+            Enemy* firstEnemy = getFirstEnemy(enemies, maxEnemies, towerCenter, towerTypeData[tower->type].radius);
+
+            if(firstEnemy != NULL)
+            {
+                vec2 enemyCenter = (vec2) {.x = firstEnemy->position.x + 0.5f, .y = firstEnemy->position.y + 0.5f};
+                addProjectile(projectiles, maxProjectiles, towerCenter, enemyCenter, PT_FIREBALL);
+                fired = true;
+            }
+            break;
+        }
+        case TT_CANNON:
+        {
+            Enemy* firstEnemy = getFirstEnemy(enemies, maxEnemies, towerCenter, towerTypeData[tower->type].radius);
+
+            if(firstEnemy != NULL)
+            {
+                vec2 enemyCenter = (vec2) {.x = firstEnemy->position.x + 0.5f, .y = firstEnemy->position.y + 0.5f};
+                addProjectile(projectiles, maxProjectiles, towerCenter, enemyCenter, PT_CANNONBALL);
+                fired = true;
+            }
+            break;
+        }
+    }
+
+    if(fired)
+    {
+        tower->cooldown = towerTypeData[tower->type].cooldown;
     }
 }
 

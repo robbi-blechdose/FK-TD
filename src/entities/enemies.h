@@ -34,11 +34,8 @@ typedef struct {
 } EnemyTypeData;
 
 #define STAT_ICED    0b00000001
-#define STAT_BURNING 0b00000010
-#define STAT_GLUED   0b00000100
-//TODO more stats...
+#define STAT_STUNNED 0b00000010
 
-//TODO: total distance travelled (to determine first enemy)
 typedef struct {
     EnemyType type;
 
@@ -47,7 +44,10 @@ typedef struct {
     uint8_t direction;
     float toMove;
 
+    float totalDistance;
+
     uint8_t statModifiers;
+    uint8_t stunTimer;
 } Enemy;
 
 void initEnemies();
