@@ -49,7 +49,7 @@ void drawTower(SDL_Surface* screen, TowerType tower, vec2i position);
 void drawTowerWithRange(SDL_Surface* screen, TowerType tower, vec2i position);
 void drawTowers(SDL_Surface* screen, Tower* towers, uint16_t maxTowers);
 
-bool placeTower(vec2i* cursor, Tower* towers, uint16_t maxTowers, uint8_t type, Map* map);
+bool placeTower(vec2i* cursor, Tower* towers, uint16_t maxTowers, uint8_t type, const Map* map);
 void updateTowers(Tower* towers, uint16_t maxTowers, Enemy* enemies, uint16_t maxEnemies, Projectile* projectiles, uint16_t maxProjectiles, uint16_t* money);
 
 #endif

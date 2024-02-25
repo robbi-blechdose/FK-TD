@@ -68,7 +68,7 @@ void drawTowers(SDL_Surface* screen, Tower* towers, uint16_t maxTowers)
     }
 }
 
-bool placeTower(vec2i* cursor, Tower* towers, uint16_t maxTowers, uint8_t type, Map* map)
+bool placeTower(vec2i* cursor, Tower* towers, uint16_t maxTowers, uint8_t type, const Map* map)
 {
     if(tileIsReserved(map, cursor->x, cursor->y))
     {

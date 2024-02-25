@@ -35,17 +35,17 @@ void quitMap()
     //TODO
 }
 
-LogicTile getTileAtPos(Map* map, uint8_t x, uint8_t y)
+inline LogicTile getTileAtPos(const Map* map, uint8_t x, uint8_t y)
 {
     return map->logicTiles[x + y * MAP_WIDTH];
 }
-bool tileIsReserved(Map* map, uint8_t x, uint8_t y)
+bool tileIsReserved(const Map* map, uint8_t x, uint8_t y)
 {
     LogicTile t = getTileAtPos(map, x, y);
     return t == U || t == D || t == L || t == R || t == W;
 }
 
-void drawMap(SDL_Surface* screen, Map* map)
+void drawMap(SDL_Surface* screen, const Map* map)
 {
     static uint8_t animCounter = 0;
     animCounter++;

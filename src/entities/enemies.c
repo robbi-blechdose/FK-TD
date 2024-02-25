@@ -60,7 +60,7 @@ void drawEnemies(SDL_Surface* screen, Enemy* enemies, uint16_t maxEnemies)
     }
 }
 
-void updateEnemy(Enemy* enemy, Map* map, Game* game)
+void updateEnemy(Enemy* enemy, const Map* map, Game* game)
 {
     vec2i tilePosition = {.x = roundf(enemy->position.x), .y = roundf(enemy->position.y)};
 
@@ -120,7 +120,7 @@ void updateEnemy(Enemy* enemy, Map* map, Game* game)
     
 }
 
-bool updateEnemies(Enemy* enemies, uint16_t maxEnemies, Map* map, Game* game)
+bool updateEnemies(Enemy* enemies, uint16_t maxEnemies, const Map* map, Game* game)
 {
     bool hasEnemies = false;
 

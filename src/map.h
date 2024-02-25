@@ -36,9 +36,9 @@ extern const Map maps[NUM_MAPS];
 void initMap();
 void quitMap();
 
-LogicTile getTileAtPos(Map* map, uint8_t x, uint8_t y);
-bool tileIsReserved(Map* map, uint8_t x, uint8_t y);
+LogicTile getTileAtPos(const Map* map, uint8_t x, uint8_t y);
+bool tileIsReserved(const Map* map, uint8_t x, uint8_t y);
 
-void drawMap(SDL_Surface* screen, Map* map);
+void drawMap(SDL_Surface* screen, const Map* map);
 
 #endif

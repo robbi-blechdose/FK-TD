@@ -53,7 +53,7 @@ void initEnemies();
 void quitEnemies();
 
 void drawEnemies(SDL_Surface* screen, Enemy* enemies, uint16_t maxEnemies);
-bool updateEnemies(Enemy* enemies, uint16_t maxEnemies, Map* map, Game* game);
+bool updateEnemies(Enemy* enemies, uint16_t maxEnemies, const Map* map, Game* game);
 
 bool addEnemy(Enemy* enemies, uint16_t maxEnemies, uint8_t x, uint8_t y, uint8_t dir, uint8_t type);
 
