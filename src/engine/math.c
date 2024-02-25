@@ -10,12 +10,12 @@ void vec2i_copy(vec2i* dst, vec2i* src)
 
 uint8_t vec2i_distance(vec2i* va, vec2i* vb)
 {
-    return sqrt(pow(va->x - vb->x, 2) + pow(va->y - vb->y, 2));
+    return sqrtf(powf(va->x - vb->x, 2) + powf(va->y - vb->y, 2));
 }
 
 bool vec2i_withinRadius(vec2i* va, vec2i* vb, uint8_t radius)
 {
-    return sqrtf(powf(va->x - vb->x, 2) + powf(va->y - vb->y, 2)) < radius;
+    return vec2i_distance(va, vb) < radius;
 }
 
 bool vec2_withinRadius(vec2 va, vec2 vb, float radius)

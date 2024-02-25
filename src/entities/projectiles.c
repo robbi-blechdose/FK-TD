@@ -34,8 +34,8 @@ void drawProjectiles(SDL_Surface* screen, Projectile* projectiles, uint16_t maxP
             SDL_Rect rect = {.x = (animCounter / 8 % 2) * 8,
                                 .y = 0,
                                 .w = 8, .h = 8};
-            SDL_Rect pos = {.x = projectiles[i].position.x * 16,
-                            .y = projectiles[i].position.y * 16};
+            SDL_Rect pos = {.x = projectiles[i].position.x * 16 - 4,
+                            .y = projectiles[i].position.y * 16 - 4};
             SDL_BlitSurface(projectileTextures[projectiles[i].type], &rect, screen, &pos);
         }
     }
@@ -90,7 +90,8 @@ bool updateProjectiles(Projectile* projectiles, uint16_t maxProjectiles, Enemy* 
                 continue;
             }
 
-            if(vec2_withinRadius(enemies[j].position, projectiles[i].position, projectileTypes[projectiles[i].type].radius))
+            vec2 enemyCenter = (vec2) {.x = enemies[j].position.x + 0.5f, .y = enemies[j].position.y + 0.5f};
+            if(vec2_withinRadius(enemyCenter, projectiles[i].position, projectileTypes[projectiles[i].type].radius))
             {
                 if(projectileTypes[projectiles[i].type].hitEffect != EFT_NONE)
                 {

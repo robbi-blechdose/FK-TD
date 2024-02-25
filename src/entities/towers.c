@@ -153,14 +153,16 @@ void towerAttack(Tower* tower, Enemy* enemies, uint16_t maxEnemies, Projectile* 
             }
             else if(tower->type == TT_FIREBALL)
             {
-                vec2 towerPosition = (vec2) {.x = tower->position.x, tower->position.y};
-                addProjectile(projectiles, maxProjectiles, towerPosition, enemies[j].position, PT_FIREBALL);
+                vec2 towerCenter = (vec2) {.x = tower->position.x + 0.5f, .y = tower->position.y + 0.5f};
+                vec2 enemyCenter = (vec2) {.x = enemies[j].position.x + 0.5f, .y = enemies[j].position.y + 0.5f};
+                addProjectile(projectiles, maxProjectiles, towerCenter, enemyCenter, PT_FIREBALL);
                 break;
             }
             else if(tower->type == TT_CANNON)
             {
-                vec2 towerPosition = (vec2) {.x = tower->position.x, .y = tower->position.y};
-                addProjectile(projectiles, maxProjectiles, towerPosition, enemies[j].position, PT_CANNONBALL);
+                vec2 towerCenter = (vec2) {.x = tower->position.x + 0.5f, .y = tower->position.y + 0.5f};
+                vec2 enemyCenter = (vec2) {.x = enemies[j].position.x + 0.5f, .y = enemies[j].position.y + 0.5f};
+                addProjectile(projectiles, maxProjectiles, towerCenter, enemyCenter, PT_CANNONBALL);
                 break;
             }
         }
