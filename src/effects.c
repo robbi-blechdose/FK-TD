@@ -6,12 +6,17 @@ const uint8_t effectTimers[] = {
     0, 5, 5, 10
 };
 
-Effect effects[255];
+#define NUM_EFFECTS 4096
+Effect effects[NUM_EFFECTS];
 
 SDL_Surface* explosion;
 
 void initEffects()
 {
+    for(uint16_t i = 0; i < NUM_EFFECTS; i++)
+    {
+        effects[i].type = EFT_NONE;
+    }
     explosion = loadPNG("res/effects/explosion.png");
 }
 
@@ -22,7 +27,7 @@ void quitEffects()
 
 void addEffect(EffectType type, vec2 position, vec2 enemyPosition, uint8_t radius)
 {
-    for(uint8_t i = 0; i < 255; i++)
+    for(uint16_t i = 0; i < NUM_EFFECTS; i++)
     {
         if(effects[i].type == EFT_NONE)
         {
@@ -42,8 +47,13 @@ void addEffect(EffectType type, vec2 position, vec2 enemyPosition, uint8_t radiu
 
 void drawEffects(SDL_Surface* screen)
 {
-    for(uint8_t i = 0; i < 255; i++)
+    for(uint16_t i = 0; i < NUM_EFFECTS; i++)
     {
+        if(effects[i].type == EFT_NONE)
+        {
+            continue;
+        }
+
         switch(effects[i].type)
         {
             case EFT_ZAP:
@@ -69,19 +79,12 @@ void drawEffects(SDL_Surface* screen)
                 SDL_BlitSurface(explosion, &rect, screen, &pos);
                 break;
             }
-            default:
-            {
-                break;
-            }
         }
-
-        if(effects[i].type != EFT_NONE)
+        
+        effects[i].timer--;
+        if(!effects[i].timer)
         {
-            effects[i].timer--;
-            if(!effects[i].timer)
-            {
-                effects[i].type = EFT_NONE;
-            }
+            effects[i].type = EFT_NONE;
         }
     }
 }

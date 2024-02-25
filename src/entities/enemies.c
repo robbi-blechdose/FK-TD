@@ -4,18 +4,13 @@
 
 #include "../utils.h"
 
-//TODO: replace with texture size in enemytypedata (to allow for bigger enemies)
-//TODO: also rename it then since this is the frame size, not the total texture size
-//In pixels
-#define ENEMY_TEXTURE_SIZE 16
-
 const EnemyTypeData enemyTypeData[NUM_ENEMY_TYPES] = {
-    [ENT_RED] =    {.containedType = ENT_NONE,   .health = 1, .speed = 0.8f / 16, .moneyValue = 1, .texturePath = "res/enemies/Enemy_0.png"},
-    [ENT_BLUE] =   {.containedType = ENT_RED,    .health = 1, .speed = 0.8f / 16, .moneyValue = 1, .texturePath = "res/enemies/Enemy_1.png"},
-    [ENT_GREEN] =  {.containedType = ENT_BLUE,   .health = 1, .speed = 0.8f / 16, .moneyValue = 1, .texturePath = "res/enemies/Enemy_2.png"},
-    [ENT_YELLOW] = {.containedType = ENT_GREEN,  .health = 1, .speed = 1.0f / 16, .moneyValue = 1, .texturePath = "res/enemies/Enemy_3.png"},
-    [ENT_VIOLET] = {.containedType = ENT_YELLOW, .health = 1, .speed = 1.0f / 16, .moneyValue = 1, .texturePath = "res/enemies/Enemy_4.png"},
-    [ENT_SHIP] =   {.containedType = ENT_VIOLET, .health = 2, .speed = 1.5f / 16, .moneyValue = 2, .texturePath = "res/enemies/Enemy_5.png"}
+    [ENT_RED] =    {.containedType = ENT_NONE,   .health = 1, .speed = 0.8f / 16, .moneyValue = 1, .texturePath = "res/enemies/Enemy_0.png", .textureFrameSize = 16},
+    [ENT_BLUE] =   {.containedType = ENT_RED,    .health = 1, .speed = 0.8f / 16, .moneyValue = 1, .texturePath = "res/enemies/Enemy_1.png", .textureFrameSize = 16},
+    [ENT_GREEN] =  {.containedType = ENT_BLUE,   .health = 1, .speed = 0.8f / 16, .moneyValue = 1, .texturePath = "res/enemies/Enemy_2.png", .textureFrameSize = 16},
+    [ENT_YELLOW] = {.containedType = ENT_GREEN,  .health = 1, .speed = 1.0f / 16, .moneyValue = 1, .texturePath = "res/enemies/Enemy_3.png", .textureFrameSize = 16},
+    [ENT_VIOLET] = {.containedType = ENT_YELLOW, .health = 1, .speed = 1.0f / 16, .moneyValue = 1, .texturePath = "res/enemies/Enemy_4.png", .textureFrameSize = 16},
+    [ENT_SHIP] =   {.containedType = ENT_VIOLET, .health = 2, .speed = 1.5f / 16, .moneyValue = 2, .texturePath = "res/enemies/Enemy_5.png", .textureFrameSize = 16}
 };
 
 SDL_Surface* enemyTextures[NUM_ENEMY_TYPES];
@@ -35,9 +30,11 @@ void quitEnemies()
 
 void drawEnemy(SDL_Surface* screen, Enemy* enemy, int animCounter)
 {
-    SDL_Rect rect = {.x = (animCounter / 8 % 2) * ENEMY_TEXTURE_SIZE,
+    uint8_t textureFrameSize = enemyTypeData[enemy->type].textureFrameSize;
+    SDL_Rect rect = {.x = (animCounter / 8 % 2) * textureFrameSize,
                         .y = 0,
-                        .w = ENEMY_TEXTURE_SIZE, .h = ENEMY_TEXTURE_SIZE};
+                        .w = textureFrameSize,
+                        .h = textureFrameSize};
     //TODO: replace 16 with map tile size
     SDL_Rect pos = {.x = enemy->position.x * 16,
                     .y = enemy->position.y * 16};

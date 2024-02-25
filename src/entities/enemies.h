@@ -30,6 +30,7 @@ typedef struct {
     uint8_t moneyValue;
 
     char* texturePath;
+    uint8_t textureFrameSize;
 } EnemyTypeData;
 
 #define STAT_ICED    0b00000001
