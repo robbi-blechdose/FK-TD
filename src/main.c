@@ -35,13 +35,9 @@ uint8_t mapSelectIndex;
 
 //Main game fields
 
-//TODO: consider replacing the tower list with an array the size of the map?
-//This would allow us to remove the position field entirely and just go by index
-
-#define MAX_TOWERS 225 //225 is the total number of 16x16 tiles that can be on screen at any time
 #define MAX_ENEMIES 1024
-#define MAX_PROJECTILES 255
-Tower towers[MAX_TOWERS];
+#define MAX_PROJECTILES 1024
+Tower towers[MAP_WIDTH * MAP_HEIGHT];
 Enemy enemies[MAX_ENEMIES];
 Projectile projectiles[MAX_PROJECTILES];
 const Map* map;
@@ -60,7 +56,7 @@ void startGame()
     game.money = 100;
     game.lives = 25;
     //Clear tower, enemy and projectile lists
-    for(uint16_t i = 0; i < MAX_TOWERS; i++)
+    for(uint16_t i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++)
     {
         towers[i].type = TT_NONE;
     }
@@ -137,7 +133,7 @@ void calcFrameGame()
     {
         if(cursorMode == CURSOR_MAP && selectedTower != TT_NONE)
         {
-            if(game.money >= towerTypeData[selectedTower].cost && placeTower(&cursor, towers, MAX_TOWERS, selectedTower, map))
+            if(game.money >= towerTypeData[selectedTower].cost && placeTower(&cursor, towers, selectedTower, map))
             {
                 game.money -= towerTypeData[selectedTower].cost;
                 //TODO: Play "placed" sound
@@ -188,7 +184,7 @@ void calcFrameGame()
     if(game.waveActive)
     {
         //Update
-        updateTowers(towers, MAX_TOWERS, enemies, MAX_ENEMIES, projectiles, MAX_PROJECTILES, &game.money);
+        updateTowers(towers, enemies, MAX_ENEMIES, projectiles, MAX_PROJECTILES, &game.money);
         bool hasEnemies = updateEnemies(enemies, MAX_ENEMIES, map, &game);
         bool hasWave = updateWaveGenerator(enemies, MAX_ENEMIES, game.wave);
         bool hasProjectiles = updateProjectiles(projectiles, MAX_PROJECTILES, enemies, MAX_ENEMIES, &game.money);
@@ -270,7 +266,7 @@ void drawFrame()
         case STATE_GAME:
         {
             drawMap(screen, map);
-            drawTowers(screen, towers, MAX_TOWERS);
+            drawTowers(screen, towers);
             drawEnemies(screen, enemies, MAX_ENEMIES);
             drawProjectiles(screen, projectiles, MAX_PROJECTILES);
             drawHUD(screen, &game);

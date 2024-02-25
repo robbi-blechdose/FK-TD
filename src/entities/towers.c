@@ -1,6 +1,8 @@
 #include "towers.h"
 
 #include "../effects.h"
+//TODO: move map size and map tile size somewhere else so we don't need to include the map header?
+#include "../map.h"
 
 //TODO: replace with map tile size?
 #define TOWER_TEXTURE_SIZE 16
@@ -43,70 +45,53 @@ void drawTowerWithRange(SDL_Surface* screen, TowerType tower, vec2i position)
 }
 
 //TODO: switch to using drawTower
-void drawTowers(SDL_Surface* screen, Tower* towers, uint16_t maxTowers)
+void drawTowers(SDL_Surface* screen, Tower* towers)
 {
     static uint8_t animCounter = 0;
     animCounter++;
 
-    for(uint16_t i = 0; i < maxTowers; i++)
+    for(uint16_t i = 0; i < MAP_WIDTH; i++)
     {
-        if(towers[i].type != TT_NONE)
+        for(uint16_t j = 0; j < MAP_HEIGHT; j++)
         {
-            SDL_Rect pos = {.x = towers[i].position.x * TOWER_TEXTURE_SIZE,
-                            .y = towers[i].position.y * TOWER_TEXTURE_SIZE};
-            if(towerTypeData[towers[i].type].numFrames)
+            Tower* tower = &towers[i + j * MAP_WIDTH];
+
+            if(tower->type != TT_NONE)
             {
-                SDL_Rect rect = {.x = (animCounter / TOWER_TEXTURE_SIZE % towerTypeData[towers[i].type].numFrames) * TOWER_TEXTURE_SIZE,
-                                    .y = 0, .w = TOWER_TEXTURE_SIZE, .h = TOWER_TEXTURE_SIZE};
-                SDL_BlitSurface(towerTextures[towers[i].type], &rect, screen, &pos);
-            }
-            else
-            {
-                SDL_BlitSurface(towerTextures[towers[i].type], NULL, screen, &pos);
+                SDL_Rect pos = {.x = i * TOWER_TEXTURE_SIZE,
+                                .y = j * TOWER_TEXTURE_SIZE};
+                
+                if(towerTypeData[tower->type].numFrames)
+                {
+                    SDL_Rect rect = {.x = (animCounter / TOWER_TEXTURE_SIZE % towerTypeData[tower->type].numFrames) * TOWER_TEXTURE_SIZE,
+                                        .y = 0,
+                                        .w = TOWER_TEXTURE_SIZE,
+                                        .h = TOWER_TEXTURE_SIZE};
+                    SDL_BlitSurface(towerTextures[tower->type], &rect, screen, &pos);
+                }
+                else
+                {
+                    SDL_BlitSurface(towerTextures[tower->type], NULL, screen, &pos);
+                }
             }
         }
     }
 }
 
-bool placeTower(vec2i* cursor, Tower* towers, uint16_t maxTowers, uint8_t type, const Map* map)
+bool placeTower(vec2i* cursor, Tower* towers, uint8_t type, const Map* map)
 {
     if(tileIsReserved(map, cursor->x, cursor->y))
     {
-        //Can't place here
+        return false;
+    }
+    
+    if(towers[cursor->x + cursor->y * MAP_WIDTH].type != TT_NONE)
+    {
         return false;
     }
 
-    bool hasFreeIndex = false;
-    uint16_t freeIndex = 0;
-    
-    //Find the first free index AND check all tower positions to make sure there's no tower in the same position
-    for(uint16_t i = 0; i < maxTowers; i++)
-    {
-        if(towers[i].type != TT_NONE)
-        {
-            if(towers[i].position.x == cursor->x &&
-                towers[i].position.y == cursor->y)
-            {
-                //Position is already taken
-                return false;
-            }
-        }
-        else if(!hasFreeIndex)
-        {
-            hasFreeIndex = true;
-            freeIndex = i;
-        }
-    }
-
-    if(hasFreeIndex)
-    {
-        //We found a spot, place the tower
-        towers[freeIndex].type = type;
-        towers[freeIndex].position.x = cursor->x;
-        towers[freeIndex].position.y = cursor->y;
-        return true;
-    }
-    return false;
+    towers[cursor->x + cursor->y * MAP_WIDTH].type = type;
+    return true;
 }
 
 Enemy* getFirstEnemy(Enemy* enemies, uint16_t maxEnemies, vec2 towerCenter, float towerRadius)
@@ -141,11 +126,9 @@ Enemy* getFirstEnemy(Enemy* enemies, uint16_t maxEnemies, vec2 towerCenter, floa
     return NULL;
 }
 
-void towerAttack(Tower* tower, Enemy* enemies, uint16_t maxEnemies, Projectile* projectiles, uint16_t maxProjectiles, uint16_t* money)
+void towerAttack(Tower* tower, vec2 towerCenter, Enemy* enemies, uint16_t maxEnemies, Projectile* projectiles, uint16_t maxProjectiles, uint16_t* money)
 {
     bool fired = false;
-
-    vec2 towerCenter = (vec2) {.x = tower->position.x + 0.5f, .y = tower->position.y + 0.5f};
     
     switch(tower->type)
     {
@@ -220,21 +203,27 @@ void towerAttack(Tower* tower, Enemy* enemies, uint16_t maxEnemies, Projectile* 
     }
 }
 
-void updateTowers(Tower* towers, uint16_t maxTowers, Enemy* enemies, uint16_t maxEnemies, Projectile* projectiles, uint16_t maxProjectiles, uint16_t* money)
+void updateTowers(Tower* towers, Enemy* enemies, uint16_t maxEnemies, Projectile* projectiles, uint16_t maxProjectiles, uint16_t* money)
 {
-    for(uint16_t i = 0; i < maxTowers; i++)
+    for(uint16_t i = 0; i < MAP_WIDTH; i++)
     {
-        if(towers[i].type == TT_NONE)
+        for(uint16_t j = 0; j < MAP_HEIGHT; j++)
         {
-            continue;
-        }
+            Tower* tower = &towers[i + j * MAP_WIDTH];
 
-        if(towers[i].cooldown > 0)
-        {
-            towers[i].cooldown--;
-            continue;
+            if(tower->type == TT_NONE)
+            {
+                continue;
+            }
+
+            if(tower->cooldown > 0)
+            {
+                tower->cooldown--;
+                continue;
+            }
+            
+            vec2 towerCenter = (vec2) {.x = i + 0.5f, .y = j + 0.5f};
+            towerAttack(tower, towerCenter, enemies, maxEnemies, projectiles, maxProjectiles, money);
         }
-        
-        towerAttack(&towers[i], enemies, maxEnemies, projectiles, maxProjectiles, money);
     }
 }
