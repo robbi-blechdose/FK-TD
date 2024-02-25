@@ -52,7 +52,7 @@ TowerType selectedTower;
 void startGame()
 {
     game.wave = 0;
-    game.waveActive = 0;
+    game.waveActive = false;
     game.money = 100;
     game.lives = 25;
     //Clear tower, enemy and projectile lists
@@ -80,7 +80,7 @@ void startGame()
 void startWave()
 {
     game.wave++;
-    game.waveActive = 1;
+    game.waveActive = true;
     initWaveGenerator(game.wave, map->startPosition);
 }
 
@@ -269,7 +269,7 @@ void drawFrame()
             drawTowers(screen, towers);
             drawEnemies(screen, enemies, MAX_ENEMIES);
             drawProjectiles(screen, projectiles, MAX_PROJECTILES);
-            drawHUD(screen, &game);
+            drawHUD(screen, &game, &cursor, cursorMode);
             drawCursor(screen, &cursor, cursorMode, selectedTower);
             drawEffects(screen);
             break;

@@ -59,7 +59,9 @@ void drawMap(SDL_Surface* screen, const Map* map)
             if(renderTiles[index].frames)
             {
                 SDL_Rect rect = {.x = (animCounter / MAP_TILE_SIZE % renderTiles[index].frames) * MAP_TILE_SIZE,
-                                    .y = 0, .w = MAP_TILE_SIZE, .h = MAP_TILE_SIZE};
+                                    .y = 0,
+                                    .w = MAP_TILE_SIZE,
+                                    .h = MAP_TILE_SIZE};
                 SDL_BlitSurface(renderTiles[index].tile, &rect, screen, &pos);
             }
             else

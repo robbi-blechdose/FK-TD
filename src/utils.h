@@ -7,7 +7,7 @@
 
 typedef struct {
     uint16_t wave;
-    uint8_t waveActive;
+    bool waveActive;
     uint16_t money;
     uint8_t lives;
 } Game;

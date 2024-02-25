@@ -77,10 +77,6 @@ bool updateProjectiles(Projectile* projectiles, uint16_t maxProjectiles, Enemy* 
         projectiles[i].position.x = lerpf(projectiles[i].target.x, projectiles[i].source.x, projectiles[i].timer / (float) projectileTypes[projectiles[i].type].life);
         projectiles[i].position.y = lerpf(projectiles[i].target.y, projectiles[i].source.y, projectiles[i].timer / (float) projectileTypes[projectiles[i].type].life);
         projectiles[i].timer--;
-        if(!projectiles[i].timer)
-        {
-            projectiles[i].type = PT_NONE;
-        }
 
         bool hit = false;
         for(uint16_t j = 0; j < maxEnemies; j++)
@@ -101,7 +97,7 @@ bool updateProjectiles(Projectile* projectiles, uint16_t maxProjectiles, Enemy* 
                 hit = true;
             }
         }
-        if(hit)
+        if(hit || !projectiles[i].timer)
         {
             projectiles[i].type = PT_NONE;
         }
