@@ -16,7 +16,7 @@ typedef enum {
 
 typedef struct {
     EffectType type;
-    vec2i a, b, middle;
+    vec2i a, b;
     uint8_t radius;
     uint8_t timer;
 } Effect;

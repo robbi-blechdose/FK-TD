@@ -52,6 +52,7 @@ vec2i cursorBackup;
 vec2i cursor;
 TowerType selectedTower;
 
+//TODO: clear effect list as well
 void startGame()
 {
     game.wave = 0;

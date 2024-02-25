@@ -38,6 +38,7 @@ typedef struct {
 #define STAT_GLUED   0b00000100
 //TODO more stats...
 
+//TODO: total distance travelled (to determine first enemy)
 typedef struct {
     EnemyType type;
 

@@ -6,17 +6,15 @@ const uint8_t effectTimers[] = {
     0, 5, 5, 10
 };
 
-#define NUM_EFFECTS 4096
-Effect effects[NUM_EFFECTS];
+#define MAX_EFFECTS 4096
+Effect effects[MAX_EFFECTS];
+uint16_t effectsSize;
 
 SDL_Surface* explosion;
 
 void initEffects()
 {
-    for(uint16_t i = 0; i < NUM_EFFECTS; i++)
-    {
-        effects[i].type = EFT_NONE;
-    }
+    effectsSize = 0;
     explosion = loadPNG("res/effects/explosion.png");
 }
 
@@ -27,39 +25,38 @@ void quitEffects()
 
 void addEffect(EffectType type, vec2 position, vec2 enemyPosition, uint8_t radius)
 {
-    for(uint16_t i = 0; i < NUM_EFFECTS; i++)
+    if(effectsSize >= MAX_EFFECTS)
     {
-        if(effects[i].type == EFT_NONE)
-        {
-            effects[i].type = type;
-            effects[i].timer = effectTimers[type];
-            effects[i].radius = radius * 16;
-            effects[i].a.x = position.x * 16;
-            effects[i].a.y = position.y * 16;
-            effects[i].b.x = enemyPosition.x * 16;
-            effects[i].b.y = enemyPosition.y * 16;
-            effects[i].middle.x = effects[i].a.x + (effects[i].b.x - effects[i].a.x) / 2;
-            effects[i].middle.y = effects[i].a.y + (effects[i].b.y - effects[i].a.y) / 2;
-            break;
-        }
+        return;
     }
+
+    effects[effectsSize].type = type;
+    effects[effectsSize].timer = effectTimers[type];
+    effects[effectsSize].radius = radius * 16;
+    effects[effectsSize].a.x = position.x * 16;
+    effects[effectsSize].a.y = position.y * 16;
+    effects[effectsSize].b.x = enemyPosition.x * 16;
+    effects[effectsSize].b.y = enemyPosition.y * 16;
+
+    effectsSize++;
+}
+
+void removeEffect(uint16_t index)
+{
+    effects[index] = effects[effectsSize - 1];
+    effectsSize--;
 }
 
 void drawEffects(SDL_Surface* screen)
 {
-    for(uint16_t i = 0; i < NUM_EFFECTS; i++)
+    for(uint16_t i = 0; i < effectsSize; i++)
     {
-        if(effects[i].type == EFT_NONE)
-        {
-            continue;
-        }
-
         switch(effects[i].type)
         {
             case EFT_ZAP:
             {
-                uint8_t mx = effects[i].middle.x + (rand() % 16 - 8);
-                uint8_t my = effects[i].middle.y + (rand() % 16 - 8);
+                uint8_t mx = effects[i].a.x + (effects[i].b.x - effects[i].a.x) / 2 + (rand() % 16 - 8);
+                uint8_t my = effects[i].a.y + (effects[i].b.y - effects[i].a.y) / 2 + (rand() % 16 - 8);
                 thickLineRGBA(screen, effects[i].a.x, effects[i].a.y, mx, my, 2, 0, 170, 255, 255);
                 thickLineRGBA(screen, mx, my, effects[i].b.x, effects[i].b.y, 2, 0, 170, 255, 255);
                 break;
@@ -84,7 +81,7 @@ void drawEffects(SDL_Surface* screen)
         effects[i].timer--;
         if(!effects[i].timer)
         {
-            effects[i].type = EFT_NONE;
+            removeEffect(i);
         }
     }
 }
